@@ -84,7 +84,6 @@
     {
       label: "ACCOUNT",
       items: [
-        // { id: "account", label: "Account", href: "account.html", icon: "user" },
         { id: "settings", label: "Settings", href: "settings.html", icon: "settings" },
       ],
     },
@@ -185,17 +184,15 @@
   function buildTopbar(profile) {
     return `
       <header class="topbar">
-        <button type="button" class="icon-btn topbar-menu" id="nav-open" aria-label="Open menu">
-          ${icon("menu", 18)}
-        </button>
+      
         <label class="search">
           ${icon("search", 18)}
           <input type="search" placeholder="Search..." aria-label="Search" />
         </label>
         <div class="topbar-actions">
-          <button type="button" class="icon-btn" aria-label="Language">${icon("language", 18)}</button>
-          <button type="button" class="icon-btn" aria-label="Messages">${icon("chat", 18)}</button>
-          <button type="button" class="icon-btn has-dot" aria-label="Notifications">${icon("bell", 18)}</button>
+          <button type="button" class="icon-btn" aria-label="Language" disabled>${icon("language", 18)}</button>
+          <button type="button" class="icon-btn" aria-label="Messages" disabled>${icon("chat", 18)}</button>
+          <button type="button" class="icon-btn has-dot" aria-label="Notifications" disabled>${icon("bell", 18)}</button>
           <div class="theme-switch" role="group" aria-label="Theme">
             <button type="button" class="theme-btn" data-theme-value="light" aria-label="Light mode">${icon("sun", 18)}</button>
             <button type="button" class="theme-btn" data-theme-value="dark" aria-label="Dark mode">${icon("moon", 18)}</button>
@@ -205,7 +202,7 @@
               <span class="user-avatar">${initials(profile.name)}</span>
               <span class="user-meta">
                 <span class="user-name">${profile.name}</span>
-                <span class="user-role">${profile.email || profile.role}</span>
+                <span class="user-role">${ profile.role}</span>
               </span>
               <span class="user-caret">${icon("chevronDown", 16)}</span>
             </button>

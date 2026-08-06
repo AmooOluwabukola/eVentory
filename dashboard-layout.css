@@ -422,6 +422,11 @@ body.shell-ready #page {
   transition: border-color 0.16s ease, color 0.16s ease;
 }
 
+.icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .icon-btn:hover {
   border-color: #cdb4f8;
   color: var(--brand);
