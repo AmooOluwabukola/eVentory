@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>eVentory — Inventory management made effortless</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Nav section -->
+  <header class="nav">
+    <div class="logo">
+      <img src="logo.png" alt="eventory logo" />
+    </div>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">About</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="loginPage.html" class="signin-link">Sign In</a>
+      <button class="btn btn-primary">Get Started</button>
+    </div>
+  </header>
+
+  <!-- Hero section -->
+  <section class="hero">
+    <h1>
+      Inventory management
+      <br />
+      <span class="accent">made effortless.</span>
+    </h1>
+    <p class="hero-subtext">
+      eVentory helps you track stock, manage sales, and grow your business — no technical
+      experience needed. Built for the way Nigerian retailers actually work.
+    </p>
+    <button class="btn btn-primary btn-lg">Start for Free</button>
+
+    <!-- Dashboard mock  section    -->
+    <div class="dashboard-mock">
+      <div class="browser-bar">
+        <span class="dot red"></span>
+        <span class="dot amber"></span>
+        <span class="dot green"></span>
+        <span class="url-text">eventory.app/dashboard</span>
+      </div>
+      <div class="dashboard-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">REVENUE</div>
+            <div class="stat-value">₦1.29M</div>
+            <div class="stat-change positive">+12.4%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ITEMS SOLD</div>
+            <div class="stat-value">847</div>
+            <div class="stat-change positive">+8.2%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">PRODUCTS</div>
+            <div class="stat-value">48</div>
+            <div class="stat-change positive">+2</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">LOW STOCK</div>
+            <div class="stat-value">4 items</div>
+            <div class="stat-change negative">Alert</div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Revenue Overview</div>
+          <svg viewBox="0 0 600 120" class="chart-svg" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#7C3AED" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,80 C80,85 140,95 220,70 C300,45 360,60 440,50 C500,44 550,40 600,35"
+              fill="none" stroke="#7C3AED" stroke-width="3" />
+            <path
+              d="M0,80 C80,85 140,95 220,70 C300,45 360,60 440,50 C500,44 550,40 600,35 L600,120 L0,120 Z"
+              fill="url(#revGradient)" />
+          </svg>
+          <div class="chart-months">
+            <span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="features-section">
+    <div class="section-inner">
+      <h2>Everything your store needs</h2>
+      <p class="section-subtext">Powerful tools. Simple enough for anyone to use.</p>
+
+      <div class="features-grid" id="features-grid"></div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="pricing-section">
+    <div class="section-inner">
+      <h2>Simple, transparent pricing</h2>
+      <p class="section-subtext">No hidden fees. Cancel anytime.</p>
+
+      <div class="pricing-grid" id="pricing-grid"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="logo footer-logo">
+      <img src="logo.png" alt="eventory logo"/>
+    </div>
+    <p>© 2026 Eventory. All rights reserved. Built for African retail.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

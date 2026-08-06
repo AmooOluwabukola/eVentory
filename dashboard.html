@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Overview — eVentory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <!--
+      Reusable shell pattern:
+      Put only this page's content inside #page.
+      dashboard-layout.js wraps it with sidebar + topbar.
+      Other pages copy this pattern and change data-page / content.
+    -->
+    <div
+      id="page"
+      data-page="overview"
+      data-title="Dashboard Overview"
+      data-subtitle="Welcome back! Here's what's happening today."
+    >
+      <template data-page-actions>
+        <button type="button" class="btn btn-ghost">Export</button>
+        <button type="button" class="btn btn-primary">+ New Order</button>
+      </template>
+
+      <section class="stats-panel" id="stats-panel" aria-label="Key metrics"></section>
+
+      <section class="panel insight-panel" aria-label="Insights">
+        <div class="chart-card">
+          <h2 class="chart-title">Sales by Category</h2>
+          <p class="chart-subtitle">Monthly revenue and order volume</p>
+          <div class="chart-holder" id="category-chart"></div>
+        </div>
+
+        <div class="chart-card">
+          <h2 class="chart-title">Revenue Trend</h2>
+          <p class="chart-subtitle">Performance across product categories</p>
+          <div class="chart-holder" id="trend-chart"></div>
+          <div class="chart-legend">
+            <span class="legend-item is-brand">
+              <span class="legend-line" aria-hidden="true"></span>
+              Revenue ($)
+            </span>
+            <span class="legend-item is-green">
+              <span class="legend-line" aria-hidden="true"></span>
+              Orders
+            </span>
+          </div>
+        </div>
+
+        <aside class="activity">
+          <div class="activity-head">
+            <span class="tile tile-neutral" id="activity-icon"></span>
+            <h2 class="activity-title">Recent Activity</h2>
+            <a class="activity-link" href="#">View All</a>
+          </div>
+          <ul class="activity-list" id="activity-list"></ul>
+        </aside>
+      </section>
+
+      <section class="panel orders-panel" aria-label="Recent orders">
+        <div class="orders-head">
+          <span class="orders-icon" id="orders-icon"></span>
+          <h2 class="orders-title">Recent Orders</h2>
+          <div class="orders-tools">
+            <button type="button" class="pill-btn" id="filter-btn">
+              <span>Filter</span>
+            </button>
+            <button type="button" class="pill-btn" id="sort-btn">
+              <span>Sort By</span>
+            </button>
+          </div>
+        </div>
+
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th class="col-id">
+                <span class="th-inner" data-th-icon="checkSquare">ORDER ID</span>
+              </th>
+              <th class="col-customer">
+                <span class="th-inner" data-th-icon="user">CUSTOMER</span>
+              </th>
+              <th class="col-date">
+                <span class="th-inner" data-th-icon="calendar">DATE</span>
+              </th>
+              <th class="col-total">
+                <span class="th-inner" data-th-icon="naira">TOTAL</span>
+              </th>
+              <th>
+                <span class="th-inner" data-th-icon="filterLines">STATUS</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </section>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="dashboard-layout.js"></script>
+    <script src="charts.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

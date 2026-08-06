@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders — eVentory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="orders.css" />
+  </head>
+  <body>
+    <div id="page" data-page="orders" data-title="Orders" data-subtitle="">
+
+      <!-- Tabs -->
+      <nav class="orders-tabs" id="orders-tabs" aria-label="Orders sections">
+        <button type="button" class="orders-tab is-active" data-tab="history">Sales History</button>
+        <button type="button" class="orders-tab" data-tab="record">+ Record Sale</button>
+      </nav>
+
+      <!-- ===================== Sales History ===================== -->
+      <section class="orders-panel" data-tab-panel="history">
+
+        <!-- List view -->
+        <div id="history-list-view">
+          <div class="stats-row" id="order-stats"></div>
+
+          <div class="panel">
+            <div class="table-toolbar">
+              <label class="table-search">
+                <span class="search-icon" data-icon="search"></span>
+                <input type="search" id="order-search" placeholder="Search stock history..." />
+              </label>
+              <span class="select-wrap toolbar-select">
+                <select id="status-filter">
+                  <option value="">All statuses</option>
+                  <option value="completed">Completed</option>
+                  <option value="credit">Credit</option>
+                  <option value="refunded">Refunded</option>
+                </select>
+                <span class="select-caret" data-icon="chevronDown"></span>
+              </span>
+              <button type="button" class="btn btn-ghost" id="export-btn">
+                <span class="btn-icon" data-order-icon="download"></span>
+                Export
+              </button>
+            </div>
+
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>ORDER ID</th>
+                  <th>DATE</th>
+                  <th>CUSTOMER</th>
+                  <th>ITEMS</th>
+                  <th>TOTAL</th>
+                  <th>STATUS</th>
+                  <th>ATTENDANT</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Detail view (drill-down, hidden until an order is opened) -->
+        <div id="order-detail-view" hidden>
+          <div class="detail-head">
+            <div class="detail-head-left">
+              <button type="button" class="btn btn-ghost" id="back-to-list-btn">
+                <span class="btn-icon" data-order-icon="arrowLeft"></span>
+                Back
+              </button>
+              <h2 class="detail-title" id="detail-title">Order</h2>
+            </div>
+            <button type="button" class="btn btn-primary" id="view-receipt-btn">
+              <span class="btn-icon" data-order-icon="receipt"></span>
+              View Receipt
+            </button>
+          </div>
+
+          <div class="detail-grid">
+            <div class="panel detail-card">
+              <h3 class="detail-card-title">Order Details</h3>
+              <div id="detail-items"></div>
+              <div class="detail-total-row">
+                <span>Total</span>
+                <span id="detail-total">₦0</span>
+              </div>
+            </div>
+
+            <div class="panel detail-card sale-info-card">
+              <h3 class="detail-card-title">Sale Info</h3>
+              <dl class="sale-info-list" id="sale-info-list"></dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== Record Sale ===================== -->
+      <section class="orders-panel" data-tab-panel="record" hidden>
+        <div class="record-grid">
+          <div class="record-main">
+
+            <div class="panel">
+              <h2 class="detail-card-title">Add Items</h2>
+              <div class="add-items-row">
+                <span class="select-wrap add-items-select">
+                  <select id="product-select">
+                    <option value="" disabled selected>Select a product</option>
+                  </select>
+                  <span class="select-caret" data-icon="chevronDown"></span>
+                </span>
+                <input type="number" id="item-qty" value="1" min="1" class="qty-input" />
+                <button type="button" class="btn btn-primary" id="add-item-btn">+ Add</button>
+              </div>
+
+              <div id="cart-items"></div>
+
+              <div class="cart-empty" id="cart-empty">
+                <span class="cart-empty-icon" data-order-icon="cart"></span>
+                <p>No items added yet. Select a product above.</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2 class="detail-card-title">Customer (Optional)</h2>
+              <div class="field-row">
+                <label class="field">
+                  <span class="field-label">CUSTOMER NAME</span>
+                  <input type="text" id="customerName" placeholder="Walk-in" />
+                </label>
+                <label class="field">
+                  <span class="field-label">PHONE NUMBER</span>
+                  <input type="tel" id="customerPhone" placeholder="+234..." />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <aside class="panel order-summary-card">
+            <h2 class="detail-card-title">Order Summary</h2>
+
+            <div class="summary-row">
+              <span>Items</span>
+              <span id="summary-items">0</span>
+            </div>
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">₦0</span>
+            </div>
+            <div class="summary-row summary-total">
+              <span>Total</span>
+              <span id="summary-total">₦0</span>
+            </div>
+
+            <p class="payment-label">PAYMENT METHOD</p>
+            <div class="payment-grid" id="payment-grid"></div>
+
+            <div class="summary-warning" id="summary-warning">
+              <span data-order-icon="warning"></span>
+              <span>Add at least one item.</span>
+            </div>
+
+            <button type="button" class="btn btn-primary summary-submit" id="record-sale-btn" disabled>
+              <span class="btn-icon" data-order-icon="check"></span>
+              <span id="record-sale-label">Record Sale · ₦0</span>
+            </button>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <!-- Receipt modal -->
+    <div class="modal-overlay" id="receipt-overlay" hidden>
+      <div class="receipt-box" id="receipt-box">
+        <div class="receipt-print-area" id="receipt-print-area"></div>
+        <button type="button" class="btn btn-primary receipt-print-btn" id="print-receipt-btn">
+          <span class="btn-icon" data-order-icon="download"></span>
+          Print Receipt
+        </button>
+        <button type="button" class="receipt-close" id="receipt-close-btn">
+          <span data-order-icon="close"></span>
+        </button>
+      </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="dashboard-layout.js"></script>
+    <script src="orders.js"></script>
+  </body>
+</html>g

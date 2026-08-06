@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings — eVentory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <div
+      id="page"
+      data-page="settings"
+      data-title="Settings"
+      data-subtitle=""
+    >
+      <!-- Tabs -->
+      <nav class="settings-tabs" id="settings-tabs" aria-label="Settings sections">
+        <button type="button" class="settings-tab is-active" data-tab="business">Business</button>
+        <button type="button" class="settings-tab" data-tab="team">Team</button>
+        <button type="button" class="settings-tab" data-tab="profile">My Profile</button>
+        <button type="button" class="settings-tab" data-tab="categories">Categories</button>
+        <button type="button" class="settings-tab" data-tab="security">Security</button>
+      </nav>
+
+      <!-- Business tab -->
+      <section class="settings-panel" data-tab-panel="business">
+        <div class="panel settings-card">
+          <h2 class="settings-card-title">Business Information</h2>
+
+          <div class="settings-form">
+            <label class="field">
+              <span class="field-label">BUSINESS / SHOP NAME</span>
+              <input type="text" id="businessName" placeholder="FreshMart Superstore" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">BUSINESS TYPE</span>
+              <span class="select-wrap">
+                <select id="businessType">
+                  <option value="" disabled selected></option>
+                  <option value="retail">Retail</option>
+                  <option value="wholesale">Wholesale</option>
+                  <option value="manufacturing">Manufacturing</option>
+                  <option value="services">Services</option>
+                </select>
+                <span class="select-caret" data-icon="chevronDown"></span>
+              </span>
+            </label>
+
+            <label class="field">
+              <span class="field-label">ADDRESS</span>
+              <input type="text" id="businessAddress" placeholder="14 Adeola Odeku St, Victoria Island, Lagos" />
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">PHONE</span>
+                <input type="tel" id="businessPhone" placeholder="+234 812 345 6789" />
+              </label>
+              <label class="field">
+                <span class="field-label">EMAIL</span>
+                <input type="email" id="businessEmail" placeholder="freshmart@gmail.com" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field-label">BUSINESS REGISTRATION NO.</span>
+              <input type="text" id="businessRegNo" placeholder="RC123456" />
+            </label>
+          </div>
+        </div>
+
+        <div class="panel settings-card">
+          <h2 class="settings-card-title">Currency &amp; Localization</h2>
+
+          <div class="settings-form">
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">CURRENCY</span>
+                <span class="select-wrap">
+                  <select id="currency">
+                    <option value="" disabled selected></option>
+                    <option value="NGN">₦ Nigerian Naira (NGN)</option>
+                    <option value="USD">$ US Dollar (USD)</option>
+                    <option value="GHS">₵ Ghanaian Cedi (GHS)</option>
+                  </select>
+                  <span class="select-caret" data-icon="chevronDown"></span>
+                </span>
+              </label>
+              <label class="field">
+                <span class="field-label">DATE FORMAT</span>
+                <span class="select-wrap">
+                  <select id="dateFormat">
+                    <option value="" disabled selected></option>
+                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                  </select>
+                  <span class="select-caret" data-icon="chevronDown"></span>
+                </span>
+              </label>
+            </div>
+
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">TIME ZONE</span>
+                <span class="select-wrap">
+                  <select id="timeZone">
+                    <option value="" disabled selected></option>
+                    <option value="Africa/Lagos">Africa/Lagos (WAT)</option>
+                    <option value="Africa/Accra">Africa/Accra (GMT)</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                  <span class="select-caret" data-icon="chevronDown"></span>
+                </span>
+              </label>
+              <label class="field">
+                <span class="field-label">LANGUAGE</span>
+                <span class="select-wrap">
+                  <select id="language">
+                    <option value="" disabled selected></option>
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                  </select>
+                  <span class="select-caret" data-icon="chevronDown"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary settings-save" id="save-business-btn">
+          <span class="btn-icon" data-settings-icon="check"></span>
+          Save Changes
+        </button>
+      </section>
+
+      <!-- Team tab -->
+      <section class="settings-panel" data-tab-panel="team" hidden>
+        <div class="team-header">
+          <button type="button" class="btn btn-primary" id="invite-member-btn">+ Invite Member</button>
+        </div>
+
+        <div class="panel">
+          <ul class="team-list" id="team-list"></ul>
+        </div>
+      </section>
+
+      <!-- My Profile tab -->
+      <section class="settings-panel" data-tab-panel="profile" hidden>
+        <div class="panel settings-card">
+          <div class="profile-head">
+            <span class="profile-avatar" id="profile-avatar">AO</span>
+            <div class="profile-head-meta">
+              <h2 class="profile-name" id="profile-name">—</h2>
+              <p class="profile-role" id="profile-role">—</p>
+              <button type="button" class="change-photo-btn" id="change-photo-btn">Change Photo</button>
+            </div>
+          </div>
+
+          <div class="settings-form">
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">FIRST NAME</span>
+                <input type="text" id="firstName" placeholder="Adaeze" />
+              </label>
+              <label class="field">
+                <span class="field-label">LAST NAME</span>
+                <input type="text" id="lastName" placeholder="Okonkwo" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field-label">EMAIL ADDRESS</span>
+              <input type="email" id="email" placeholder="you@example.com" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">PHONE NUMBER</span>
+              <input type="tel" id="phone" placeholder="+234 800 000 0000" />
+            </label>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary settings-save" id="save-profile-btn">
+          <span class="btn-icon" data-settings-icon="check"></span>
+          Save Profile
+        </button>
+      </section>
+
+      <!-- Categories tab -->
+      <section class="settings-panel" data-tab-panel="categories" hidden>
+        <div class="category-header">
+          <button type="button" class="btn btn-primary" id="add-category-btn">+ Add Category</button>
+        </div>
+
+        <div class="panel">
+          <ul class="category-list" id="category-list"></ul>
+        </div>
+      </section>
+
+      <!-- Security tab -->
+      <section class="settings-panel" data-tab-panel="security" hidden>
+        <div class="panel settings-card">
+          <h2 class="settings-card-title">Change Password</h2>
+
+          <div class="settings-form">
+            <label class="field">
+              <span class="field-label">CURRENT PASSWORD</span>
+              <input type="password" id="currentPassword" placeholder="••••••••" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">NEW PASSWORD</span>
+              <input type="password" id="newPassword" placeholder="Min. 8 characters" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">CONFIRM NEW PASSWORD</span>
+              <input type="password" id="confirmNewPassword" placeholder="Repeat new password" />
+            </label>
+
+            <button type="button" class="btn btn-primary settings-save" id="save-security-btn">
+              Update Password
+            </button>
+          </div>
+        </div>
+
+        <div class="panel settings-card danger-card">
+          <h2 class="settings-card-title">Danger Zone</h2>
+          <p class="settings-card-sub">These actions are irreversible. Proceed with caution.</p>
+
+          <button type="button" class="btn btn-danger" id="delete-account-btn">
+            <span class="btn-icon" data-settings-icon="trash"></span>
+            Delete Account
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Shared modal (category add/edit, invite member, delete confirm) -->
+    <div class="modal-overlay" id="modal-overlay" hidden>
+      <div class="modal-box" role="dialog" aria-modal="true" id="modal-box">
+        <div class="modal-head">
+          <h3 class="modal-title" id="modal-title">Title</h3>
+          <button type="button" class="modal-close" id="modal-close">
+            <span data-settings-icon="close" data-icon-size="14"></span>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+      </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="dashboard-layout.js"></script>
+    <script src="settings.js"></script>
+  </body>
+</html>

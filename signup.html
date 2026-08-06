@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign Up — eventory</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+
+    <!-- Left: form -->
+    <div class="auth-form-panel">
+      <div class="auth-form-inner">
+
+        <div class="logo auth-logo">
+          <img src="logo.png" alt="eventory logo" />
+        </div>
+
+        <h1 class="auth-title">Get Started</h1>
+        <p class="auth-subtext">
+          Let's get you all set up so you can verify your personal account and manage your
+          inventory efficiently
+        </p>
+
+        <form id="signup-form" class="auth-form">
+
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Oluwasheyi Ogundipe" required />
+          </div>
+
+          <div class="form-group">
+            <label for="storeName">Store Name</label>
+            <input type="text" id="storeName" name="storeName" placeholder="Techcrush stores" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="devsheyi@mail.com" required />
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="08012345678" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input type="password" id="password" name="password" placeholder="Type password" required minlength="6" />
+              <button type="button" class="toggle-password" data-target="password" aria-label="Show password">👁️‍🗨️</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="password-field">
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Type password" required minlength="6" />
+              <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Show password">👁️‍🗨️</button>
+            </div>
+          </div>
+
+          <div class="form-checkbox">
+            <input type="checkbox" id="terms" name="terms" checked required />
+            <label for="terms">I agree to the terms of services and privacy Policies</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
+
+          <p class="auth-footer-text">
+            Already A User? <a href="loginPage.html">Login</a>
+          </p>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Right: illustration -->
+    <div class="auth-illustration-panel">
+      <div class="illustration-card">
+        <svg viewBox="0 0 700 700" class="illustration-svg" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="350" cy="350" r="300" fill="#F1F5F9" />
+
+          <!-- badge circle -->
+          <circle cx="230" cy="270" r="100" fill="url(#badgeGradient)" />
+          <path d="M195 250 L225 300 L270 220" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+          <!-- phone/list mockup -->
+          <rect x="360" y="150" width="220" height="420" rx="24" fill="#2D2A5E" />
+          <rect x="372" y="180" width="196" height="360" rx="6" fill="#F4A5A0" />
+          <circle cx="500" cy="165" r="6" fill="white" />
+          <circle cx="520" cy="165" r="6" fill="white" />
+          <circle cx="540" cy="165" r="6" fill="white" />
+
+          <rect x="390" y="205" width="120" height="14" rx="4" fill="white" />
+          <rect x="390" y="230" width="120" height="14" rx="4" fill="white" />
+          <rect x="390" y="255" width="120" height="14" rx="4" fill="white" />
+          <rect x="390" y="280" width="120" height="14" rx="4" fill="white" />
+
+          <rect x="390" y="330" width="150" height="10" rx="3" fill="white" />
+          <rect x="390" y="350" width="150" height="10" rx="3" fill="white" />
+          <rect x="390" y="370" width="150" height="10" rx="3" fill="white" />
+          <rect x="390" y="390" width="150" height="10" rx="3" fill="white" />
+          <rect x="390" y="410" width="150" height="10" rx="3" fill="white" />
+          <rect x="390" y="430" width="150" height="10" rx="3" fill="white" />
+
+          <!-- shopping basket -->
+          <g transform="translate(500,220)">
+            <path d="M0 30 L60 30 L52 90 L8 90 Z" fill="white" />
+            <line x1="12" y1="40" x2="12" y2="80" stroke="#F4A5A0" stroke-width="4" />
+            <line x1="30" y1="40" x2="30" y2="80" stroke="#F4A5A0" stroke-width="4" />
+            <line x1="48" y1="40" x2="48" y2="80" stroke="#F4A5A0" stroke-width="4" />
+            <path d="M8 30 C8 5, 52 5, 52 30" fill="none" stroke="white" stroke-width="6" />
+          </g>
+
+          <!-- boxes -->
+          <g>
+            <rect x="150" y="420" width="130" height="110" fill="#FDBA74" />
+            <rect x="150" y="420" width="130" height="20" fill="#FB923C" />
+            <rect x="205" y="420" width="20" height="110" fill="#FB923C" />
+          </g>
+          <g>
+            <rect x="120" y="500" width="160" height="140" fill="#FB923C" />
+            <rect x="120" y="500" width="160" height="24" fill="#F97316" />
+            <rect x="188" y="500" width="24" height="140" fill="#F97316" />
+          </g>
+
+          <!-- person -->
+          <g transform="translate(430,430)">
+            <circle cx="60" cy="10" r="28" fill="#F0A868" />
+            <path d="M32 8 C32 -14 88 -14 88 8 L88 20 L32 20 Z" fill="#1F1B4D" />
+            <rect x="20" y="35" width="80" height="120" rx="30" fill="#8B7FE8" />
+            <rect x="30" y="150" width="25" height="90" fill="#2D2A5E" />
+            <rect x="65" y="150" width="25" height="90" fill="#2D2A5E" />
+            <rect x="15" y="238" width="40" height="10" rx="4" fill="#1F1B4D" />
+            <rect x="65" y="238" width="40" height="10" rx="4" fill="#1F1B4D" />
+            <!-- laptop -->
+            <g transform="translate(-10,90) rotate(-8)">
+              <rect x="0" y="0" width="70" height="46" rx="4" fill="#3B2F63" />
+              <rect x="-6" y="46" width="82" height="8" rx="3" fill="#2D2453" />
+            </g>
+          </g>
+
+          <!-- decorative plant -->
+          <g transform="translate(260,600)" fill="#8B7FE8">
+            <ellipse cx="0" cy="0" rx="14" ry="30" transform="rotate(-20)" />
+            <ellipse cx="20" cy="-10" rx="12" ry="26" transform="rotate(10)" />
+            <ellipse cx="-18" cy="-8" rx="12" ry="24" transform="rotate(-45)" />
+          </g>
+
+          <defs>
+            <linearGradient id="badgeGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7C3AED" />
+              <stop offset="100%" stop-color="#4C1D95" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

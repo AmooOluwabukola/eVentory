@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Reports — eVentory</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="report.css" />
+  </head>
+
+  <body>
+    <div
+      id="page"
+      data-page="report"
+      data-title="Reports"
+      data-subtitle="Business performance insights"
+    >
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="hidden">
+        <div class="loading-box">
+          <div class="spinner"></div>
+
+          <p>Loading reports...</p>
+        </div>
+      </div>
+
+      <template data-page-actions>
+        <button class="btn btn-secondary" id="exportReport" type="button">
+          Export Report
+        </button>
+      </template>
+
+      <section class="reports-page">
+        <!-- ========================= -->
+        <!-- FILTER BAR -->
+        <!-- ========================= -->
+
+        <section class="panel report-toolbar">
+          <div class="filter-group" role="tablist">
+            <button
+              class="filter-btn active"
+              type="button"
+              data-period="monthly"
+            >
+              Monthly
+            </button>
+
+            <button class="filter-btn" type="button" data-period="weekly">
+              Weekly
+            </button>
+
+            <button class="filter-btn" type="button" data-period="yearly">
+              Yearly
+            </button>
+          </div>
+        </section>
+
+        <!-- ========================= -->
+        <!-- KPI CARDS -->
+        <!-- ========================= -->
+
+        <section class="summary-grid">
+          <article
+            class="summary-card"
+            id="grossRevenueCard"
+            aria-live="polite"
+          ></article>
+
+          <article
+            class="summary-card"
+            id="netProfitCard"
+            aria-live="polite"
+          ></article>
+
+          <article
+            class="summary-card"
+            id="unitsSoldCard"
+            aria-live="polite"
+          ></article>
+
+          <article
+            class="summary-card"
+            id="averageOrderCard"
+            aria-live="polite"
+          ></article>
+        </section>
+
+        <!-- ========================= -->
+        <!-- REVENUE CHART -->
+        <!-- ========================= -->
+
+        <section class="panel chart-panel">
+          <div class="section-heading">
+            <div>
+              <h2>Revenue Overview</h2>
+
+              <p>Revenue, Expenses & Profit</p>
+            </div>
+
+            <div id="lastUpdated"></div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="revenueChart" aria-label="Revenue Chart"> </canvas>
+
+            <div class="empty-state hidden" id="revenueEmpty">
+              No revenue data available.
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================= -->
+        <!-- ANALYTICS -->
+        <!-- ========================= -->
+
+        <section class="analytics-grid">
+          <!-- PRODUCTS -->
+
+          <article class="panel">
+            <div class="section-heading">
+              <h2>Top Selling Products</h2>
+            </div>
+
+            <div id="topProducts" class="products-list"></div>
+
+            <div id="productsEmpty" class="empty-state hidden">
+              No product sales recorded.
+            </div>
+          </article>
+
+          <!-- CATEGORY -->
+
+          <article class="panel">
+            <div class="section-heading">
+              <h2>Sales by Category</h2>
+            </div>
+
+            <div class="chart-wrapper">
+              <canvas id="categoryChart"> </canvas>
+
+              <div id="categoryEmpty" class="empty-state hidden">
+                No category data available.
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="api.js"></script>
+
+    <script src="dashboard-layout.js"></script>
+
+    <script src="report.js"></script>
+  </body>
+</html>

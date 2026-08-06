@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory — eVentory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="inventory.css" />
+  </head>
+  <body>
+    <div id="page" data-page="inventory" data-title="Inventory">
+      <nav class="inv-tabs" id="inv-tabs" aria-label="Inventory sections"></nav>
+
+      <section class="inv-kpis" id="inv-kpis" aria-label="Inventory summary"></section>
+
+      <section class="panel inv-panel">
+        <div class="inv-panel-head">
+          <h2 class="inv-panel-title" id="inv-panel-title">All Stock Levels</h2>
+          <div class="inv-legend" id="inv-legend"></div>
+        </div>
+        <div class="inv-table-wrap">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>PRODUCT</th>
+                <th>CATEGORY</th>
+                <th>STOCK LEVEL</th>
+                <th>MIN. STOCK</th>
+                <th>VALUE</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="inv-body"></tbody>
+          </table>
+        </div>
+        <p class="inv-empty" id="inv-empty" hidden>No items match this view.</p>
+      </section>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="dashboard-layout.js"></script>
+    <script src="inventory.js"></script>
+  </body>
+</html>

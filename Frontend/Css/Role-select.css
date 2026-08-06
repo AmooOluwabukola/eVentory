@@ -1,0 +1,143 @@
+.role-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px;
+  background: var(--white);
+}
+
+.role-logo {
+  margin-bottom: 32px;
+}
+
+.role-title {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--gray-900);
+  text-align: center;
+}
+
+.role-subtext {
+  margin-top: 8px;
+  font-size: 16px;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.role-cards {
+  display: flex;
+  gap: 32px;
+  margin-top: 56px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.role-card {
+  width: 280px;
+  background: #f5f1f0;
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  text-align: center;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.role-card.selected {
+  border-color: var(--violet-700);
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.15);
+}
+
+.role-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.role-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.role-icon.owner { background: #ede4fb; color: #8b5cf6; }
+.role-icon.manager { background: #dcfce7; color: #16a34a; }
+.role-icon.attendant { background: #fed7aa; color: #ea580c; }
+
+.role-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 12px;
+}
+
+.role-card p {
+  font-size: 14px;
+  color: var(--gray-500);
+  line-height: 1.5;
+  margin-bottom: 28px;
+  flex: 1;
+}
+
+.role-select-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.role-select-btn:hover {
+  opacity: 0.85;
+}
+
+.role-select-btn.owner-btn {
+  background: linear-gradient(90deg, #7c3aed, #6d28d9);
+  color: white;
+  border: none;
+}
+
+.role-select-btn.manager-btn {
+  background: white;
+  color: #16a34a;
+  border: 1px solid #16a34a;
+}
+
+.role-select-btn.attendant-btn {
+  background: white;
+  color: #ea580c;
+  border: 1px solid #ea580c;
+}
+
+.role-footer-text {
+  margin-top: 56px;
+  font-size: 14px;
+  color: var(--gray-900);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-footer-text a {
+  color: var(--violet-700);
+  font-weight: 700;
+}
+
+.role-footer-text a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .role-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -1,0 +1,671 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Suppliers — Tech Crush Inventory</title>
+<meta name="description" content="Manage your supplier directory: search suppliers, track orders and pending deliveries, and add or edit supplier details." />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+
+<style>
+  :root {
+    --brand: oklch(0.52 0.26 285);
+    --brand-strong: oklch(0.44 0.24 285);
+    --brand-soft: oklch(0.95 0.03 285);
+    --surface: oklch(0.98 0.004 285);
+    --panel: oklch(1 0 0);
+    --line: oklch(0.92 0.008 285);
+    --text: oklch(0.22 0.02 285);
+    --muted-2: oklch(0.58 0.02 285);
+    --star: oklch(0.79 0.16 78);
+    --ok: oklch(0.62 0.17 150);
+    --warn: oklch(0.72 0.17 60);
+    --destructive: oklch(0.577 0.245 27.325);
+    --shadow-card: 0 1px 2px oklch(0.2 0.02 285 / 0.06), 0 8px 24px oklch(0.2 0.02 285 / 0.06);
+  }
+  .dark {
+    --brand-soft: oklch(0.3 0.07 285);
+    --surface: oklch(0.16 0.02 285);
+    --panel: oklch(0.21 0.02 285);
+    --line: oklch(1 0 0 / 12%);
+    --text: oklch(0.97 0.005 285);
+    --muted-2: oklch(0.72 0.02 285);
+    --destructive: oklch(0.704 0.191 22.216);
+    --shadow-card: 0 8px 24px oklch(0 0 0 / 0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--surface); }
+
+  .app {
+    display: flex;
+    min-height: 100vh;
+    background: var(--surface);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  }
+  button, input { font-family: inherit; }
+
+  .sidebar {
+    width: 232px;
+    flex: 0 0 232px;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    padding: 18px 14px;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; padding: 4px 6px 18px; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 9px;
+    background: var(--brand); color: #fff;
+    display: grid; place-items: center; font-weight: 800; font-size: 15px;
+  }
+  .brand-name { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .nav-label { font-size: 11px; letter-spacing: .08em; color: var(--muted-2); padding: 12px 8px 6px; font-weight: 600; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    font-size: 14px; color: var(--text); background: none; border: 0;
+    width: 100%; cursor: pointer; text-align: left;
+  }
+  .nav-item:hover { background: var(--brand-soft); }
+  .nav-item.active { background: var(--brand); color: #fff; font-weight: 600; }
+  .nav-item svg { width: 17px; height: 17px; flex: 0 0 auto; }
+
+  .upgrade {
+    margin-top: auto; border: 1px solid var(--line); border-radius: 18px;
+    padding: 16px; text-align: center; background: var(--brand-soft);
+  }
+  .upgrade h4 { font-size: 18px; font-weight: 800; color: var(--brand-strong); margin: 8px 0 6px; }
+  .upgrade p { font-size: 12px; color: var(--muted-2); margin-bottom: 12px; }
+  .upgrade-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    width: 100%; padding: 8px 8px 8px 16px; border-radius: 999px;
+    border: 1px solid var(--brand); background: var(--panel); color: var(--text);
+    font-weight: 600; cursor: pointer;
+  }
+  .upgrade-btn span:last-child {
+    width: 30px; height: 30px; border-radius: 999px; background: var(--brand); color: #fff;
+    display: grid; place-items: center;
+  }
+
+  .upgrade-card {
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3fb 100%);
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(90, 60, 220, 0.10);
+  padding: 90px 20px 20px;
+  text-align: center;
+  max-width: 340px;
+  margin: 60px auto 0;
+}
+
+.upgrade-bag-wrap {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+}
+
+.upgrade-bag {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.upgrade-card h4 {
+  color: #5b2ce0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.upgrade-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0 0 22px;
+}
+
+.upgrade-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 2px solid #5b2ce0;
+  border-radius: 999px;
+  padding: 5px 5px 5px 24px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111827;
+  cursor: pointer;
+}
+
+.upgrade-btn-arrow {
+  background: #5b2ce0;
+  color: #fff;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px;
+    padding: 14px 22px; background: var(--panel); border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .topbar h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+  .top-actions { display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 999px; border: 0; background: transparent;
+    color: var(--muted-2); display: grid; place-items: center; cursor: pointer;
+  }
+  .icon-btn:hover { background: var(--brand-soft); color: var(--brand-strong); }
+  .icon-btn.on { background: var(--brand); color: #fff; }
+  .avatar { width: 34px; height: 34px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-strong); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+  .user { display: flex; align-items: center; gap: 8px; min-width: 0; cursor: default; }
+  .user small { display: block; color: var(--muted-2); font-size: 11px; }
+  .user b { font-size: 13px; }
+  .menu-toggle { display: none; }
+
+  .content { padding: 22px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-card); }
+  .panel-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .search { position: relative; flex: 1 1 240px; max-width: 320px; }
+  .search input {
+    width: 100%; padding: 9px 12px 9px 34px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--text); font-size: 13px;
+  }
+  .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--muted-2); }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 8px;
+    background: var(--brand); color: #fff; border: 0; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--brand-strong); }
+  .btn-ghost { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font-size: 13px; cursor: pointer; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+  .card { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--panel); transition: box-shadow .2s, transform .2s; }
+  .card:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+  .card-top { display: flex; gap: 10px; align-items: flex-start; }
+  .card-logo { width: 34px; height: 34px; border-radius: 9px; background: var(--brand-soft); display: grid; place-items: center; font-size: 17px; flex: 0 0 auto; }
+  .card-top h3 { font-size: 14px; font-weight: 700; margin: 0; }
+  .card-top p { font-size: 11px; color: var(--muted-2); margin: 2px 0 0; }
+  .rating { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted-2); margin-top: 3px; }
+  .rating .stars { color: var(--star); letter-spacing: 1px; }
+  .card-meta { margin-top: 12px; display: grid; gap: 6px; font-size: 12px; color: var(--muted-2); }
+  .card-meta div { display: flex; gap: 7px; align-items: center; }
+  .card-meta svg { width: 13px; height: 13px; flex: 0 0 auto; }
+  .card-stats { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
+  .card-stats b { display: block; font-size: 15px; }
+  .card-stats span { font-size: 10px; color: var(--muted-2); }
+  .card-stats .v-orders { color: var(--brand); }
+  .card-stats .v-pending-0 { color: var(--ok); }
+  .card-stats .v-pending { color: var(--warn); }
+  .card-stats .date b { font-size: 11px; font-weight: 600; }
+  .card-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .link-btn { background: none; border: 0; color: var(--brand); font-size: 12px; font-weight: 600; cursor: pointer; padding: 0; }
+  .link-btn.danger { color: var(--destructive); }
+  .empty { text-align: center; padding: 40px; color: var(--muted-2); font-size: 14px; }
+
+  .overlay { position: fixed; inset: 0; background: oklch(0.2 0.02 285 / 0.45); display: grid; place-items: center; padding: 16px; z-index: 50; }
+  .overlay.hidden { display: none; }
+  .modal { width: 100%; max-width: 420px; background: var(--panel); border-radius: 12px; padding: 20px; box-shadow: 0 24px 60px oklch(0 0 0 / 0.25); }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-head h2 { font-size: 17px; font-weight: 700; margin: 0; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 10px; letter-spacing: .06em; font-weight: 600; color: var(--muted-2); margin-bottom: 5px; }
+  .field input { width: 100%; padding: 9px 11px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font-size: 13px; }
+  .field input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .err { color: var(--destructive); font-size: 11px; margin-top: 4px; }
+
+  .backdrop-nav { display: none; }
+  .backdrop-nav.show { display: block; position: fixed; inset: 0; background: oklch(0.2 0.02 285 / 0.4); z-index: 55; }
+  @media (max-width: 900px) {
+    .menu-toggle { display: grid; }
+    .sidebar { position: fixed; z-index: 60; left: 0; top: 0; transform: translateX(-100%); transition: transform .25s ease; }
+    .sidebar.open { transform: translateX(0); }
+    .app { display: block; }
+    .content { padding: 14px; }
+    .panel { padding: 12px; }
+    .topbar { padding: 12px 14px; }
+    .user .user-text { display: none; }
+  }
+  @media (max-width: 480px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .topbar h1 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="backdrop-nav" id="backdropNav"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">e</div>
+      <div class="brand-name">Tech Crush</div>
+    </div>
+    <div class="nav-label">HOME</div>
+    <div id="navItems"></div>
+    <div class="nav-label">ACCOUNT</div>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="5"/></svg>
+      Account
+    </button>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Settings
+    </button>
+
+<div class="upgrade-card">
+  <div class="upgrade-bag-wrap">
+    <img src="/image/bagicon.png" alt="Upgrade" class="upgrade-bag" />
+  </div>
+  <h4>Unlock with Upgrade</h4>
+  <p>Free plan active - upgrade to<br>unlock more.</p>
+  <button class="upgrade-btn">
+    <span>Upgrade now</span>
+    <span class="upgrade-btn-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+      </svg>
+    </span>
+  </button>
+</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Open menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/></svg>
+        </button>
+        <h1>Suppliers</h1>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="Help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Messages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </button>
+        <button class="icon-btn on" id="lightBtn" aria-label="Light mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+        <button class="icon-btn" id="darkBtn" aria-label="Dark mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <div class="user">
+          <div class="avatar">OW</div>
+          <div class="user-text">
+            <b>Owner</b>
+            <small>Albert799@gmail.com</small>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--muted-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="panel">
+        <div class="panel-head">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="searchInput" maxlength="80" placeholder="Search suppliers..." aria-label="Search suppliers" />
+          </div>
+          <button class="btn-primary" id="addBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Add Supplier
+          </button>
+        </div>
+
+        <div id="gridWrap"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="overlay hidden" id="overlay">
+  <form class="modal" id="modalForm">
+    <div class="modal-head">
+      <h2 id="modalTitle">Add New Supplier</h2>
+      <button type="button" class="icon-btn" id="closeModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="field">
+      <label for="f-name">COMPANY NAME *</label>
+      <input id="f-name" maxlength="100" placeholder="e.g. Nestlé Nigeria" />
+      <p class="err" id="formErr" style="display:none;"></p>
+    </div>
+    <div class="row-2">
+      <div class="field">
+        <label for="f-contact">CONTACT PERSON</label>
+        <input id="f-contact" maxlength="100" placeholder="Full name" />
+      </div>
+      <div class="field">
+        <label for="f-phone">PHONE NUMBER</label>
+        <input id="f-phone" maxlength="20" placeholder="+234" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-email">EMAIL</label>
+      <input id="f-email" type="email" maxlength="255" placeholder="sales@supplier.com" />
+    </div>
+    <div class="field">
+      <label for="f-cat">PRODUCT CATEGORY</label>
+      <input id="f-cat" maxlength="80" />
+    </div>
+    <div class="field">
+      <label for="f-addr">ADDRESS</label>
+      <input id="f-addr" maxlength="200" />
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn-ghost" id="cancelBtn">Cancel</button>
+      <button type="submit" class="btn-primary" id="saveBtn">Save Supplier</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  const ICONS = {
+    LayoutGrid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',
+    Store: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7 4 3h16l2 4"/><path d="M2 7h20v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/><path d="M2 7a3 3 0 0 0 6 0M8 7a3 3 0 0 0 6 0M14 7a3 3 0 0 0 6 0"/></svg>',
+    Package: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+    Boxes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92 12 17.5l9.03-4.58"/><path d="M12 17.5V22"/><path d="M12 2 2.97 6.58 12 11.17l9.03-4.59Z"/><path d="M2.97 6.58v6.34L12 17.5V11.17Z"/><path d="M21.03 6.58v6.34L12 17.5V11.17Z"/></svg>',
+    ShoppingCart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.42H5.12"/></svg>',
+    BarChart3: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+  };
+  const NAV = [
+    { label: "Overview", icon: "LayoutGrid" },
+    { label: "Supplier Page", icon: "Store" },
+    { label: "Product", icon: "Package" },
+    { label: "Inventory", icon: "Boxes" },
+    { label: "Sales", icon: "ShoppingCart" },
+    { label: "Report", icon: "BarChart3" },
+  ];
+
+  let suppliers = [
+    { id: 1, name: "Olam Foods Ltd", category: "Grains & Cereals", rating: 4.8, contact: "Yemi Akande", phone: "+234 802 341 9920", email: "sales@olamfoods.com", address: "Lagos", orders: 32, pending: 1, lastOrder: "2025-07-20" },
+    { id: 2, name: "Dufil Prima Foods", category: "Pasta & Noodles", rating: 4.5, contact: "Blessing Okafor", phone: "+234 803 554 7710", email: "sales@dufil.com", address: "Ota", orders: 28, pending: 0, lastOrder: "2025-07-18" },
+    { id: 3, name: "Nestlé Nigeria", category: "Beverages & Dairy", rating: 4.9, contact: "Ibrahim Musa", phone: "+234 812 233 8844", email: "sales@nestle.com", address: "Abuja", orders: 45, pending: 2, lastOrder: "2025-07-22" },
+    { id: 4, name: "Dangote Industries", category: "Sugars & Staples", rating: 4.6, contact: "Chinedu Eze", phone: "+234 700 123 4567", email: "sales@dangote.com", address: "Lagos", orders: 60, pending: 0, lastOrder: "2025-07-25" },
+    { id: 5, name: "Reckitt Nigeria", category: "Personal Care", rating: 4.3, contact: "Adaeze Williams", phone: "+234 809 876 5432", email: "sales@reckitt.com", address: "Lagos", orders: 19, pending: 1, lastOrder: "2025-07-15" },
+  ];
+
+  let query = "";
+  let dark = false;
+  let active = "Sales";
+  let editingId = null;
+
+  const $ = (sel) => document.querySelector(sel);
+  const navItemsEl = $("#navItems");
+  const gridWrap = $("#gridWrap");
+  const searchInput = $("#searchInput");
+  const sidebar = $("#sidebar");
+  const backdropNav = $("#backdropNav");
+  const menuToggle = $("#menuToggle");
+  const lightBtn = $("#lightBtn");
+  const darkBtn = $("#darkBtn");
+  const overlay = $("#overlay");
+  const modalForm = $("#modalForm");
+  const modalTitle = $("#modalTitle");
+  const closeModal = $("#closeModal");
+  const cancelBtn = $("#cancelBtn");
+  const addBtn = $("#addBtn");
+  const formErr = $("#formErr");
+
+  function starsHtml(rating) {
+    const full = Math.round(rating);
+    const filled = "★★★★★".slice(0, full);
+    const rest = "★★★★★".slice(0, 5 - full);
+    return `<div class="rating"><span class="stars" aria-hidden="true">${filled}<span style="opacity:.3">${rest}</span></span><span>${rating.toFixed(1)}</span></div>`;
+  }
+
+  function renderNav() {
+    navItemsEl.innerHTML = NAV.map(
+      (n) => `<button class="nav-item${active === n.label ? " active" : ""}" data-label="${n.label}">${ICONS[n.icon]} ${n.label}</button>`
+    ).join("");
+    navItemsEl.querySelectorAll(".nav-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        active = btn.dataset.label;
+        sidebar.classList.remove("open");
+        backdropNav.classList.remove("show");
+        renderNav();
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function renderGrid() {
+    const q = query.trim().toLowerCase();
+    const filtered = !q
+      ? suppliers
+      : suppliers.filter((s) => [s.name, s.category, s.contact, s.phone].some((v) => v.toLowerCase().includes(q)));
+
+    if (filtered.length === 0) {
+      gridWrap.innerHTML = `<p class="empty">No suppliers match “${escapeHtml(query)}”.</p>`;
+      return;
+    }
+
+    gridWrap.innerHTML = `<div class="grid">${filtered
+      .map(
+        (s) => `
+      <article class="card" data-id="${s.id}">
+        <div class="card-top">
+          <div class="card-logo">🏭</div>
+          <div style="min-width:0;">
+            <h3>${escapeHtml(s.name)}</h3>
+            <p>${escapeHtml(s.category)}</p>
+            ${starsHtml(s.rating)}
+          </div>
+        </div>
+        <div class="card-meta">
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${escapeHtml(s.contact)}</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.4 2.6a2 2 0 0 1 2 0l1.6.9a2 2 0 0 0 1 .27h1.9a2 2 0 0 1 2 2v1.9c0 .35.1.7.27 1l.9 1.6a2 2 0 0 1 0 2l-.9 1.6a2 2 0 0 0-.27 1v1.9a2 2 0 0 1-2 2h-1.9a2 2 0 0 0-1 .27l-1.6.9a2 2 0 0 1-2 0l-1.6-.9a2 2 0 0 0-1-.27H8.9a2 2 0 0 1-2-2v-1.9a2 2 0 0 0-.27-1l-.9-1.6a2 2 0 0 1 0-2l.9-1.6a2 2 0 0 0 .27-1V3.77a2 2 0 0 1 2-2h1.9a2 2 0 0 0 1-.27z"/></svg> ${escapeHtml(s.phone)}</div>
+        </div>
+        <div class="card-stats">
+          <div><b class="v-orders">${s.orders}</b><span>Orders</span></div>
+          <div><b class="${s.pending === 0 ? "v-pending-0" : "v-pending"}">${s.pending}</b><span>Pending</span></div>
+          <div class="date"><b>${s.lastOrder}</b><span>Last Order</span></div>
+        </div>
+        <div class="card-actions">
+          <button class="link-btn" data-action="edit" data-id="${s.id}">Edit</button>
+          <button class="link-btn danger" data-action="delete" data-id="${s.id}">Delete</button>
+        </div>
+      </article>`
+      )
+      .join("")}</div>`;
+
+    gridWrap.querySelectorAll('[data-action="edit"]').forEach((btn) =>
+      btn.addEventListener("click", () => openEdit(Number(btn.dataset.id)))
+    );
+    gridWrap.querySelectorAll('[data-action="delete"]').forEach((btn) =>
+      btn.addEventListener("click", () => {
+        suppliers = suppliers.filter((s) => s.id !== Number(btn.dataset.id));
+        renderGrid();
+      })
+    );
+  }
+
+  function setForm(vals) {
+    $("#f-name").value = vals.name || "";
+    $("#f-contact").value = vals.contact || "";
+    $("#f-phone").value = vals.phone || "";
+    $("#f-email").value = vals.email || "";
+    $("#f-cat").value = vals.category || "";
+    $("#f-addr").value = vals.address || "";
+  }
+
+  function openAdd() {
+    editingId = null;
+    modalTitle.textContent = "Add New Supplier";
+    $("#saveBtn").textContent = "Save Supplier";
+    setForm({});
+    formErr.style.display = "none";
+    overlay.classList.remove("hidden");
+  }
+
+  function openEdit(id) {
+    const s = suppliers.find((x) => x.id === id);
+    if (!s) return;
+    editingId = id;
+    modalTitle.textContent = "Edit Supplier";
+    $("#saveBtn").textContent = "Update";
+    setForm(s);
+    formErr.style.display = "none";
+    overlay.classList.remove("hidden");
+  }
+
+  function closeOverlay() {
+    overlay.classList.add("hidden");
+  }
+
+  modalForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $("#f-name").value.trim().slice(0, 100);
+    if (!name) {
+      formErr.textContent = "Company name is required.";
+      formErr.style.display = "block";
+      return;
+    }
+    const vals = {
+      name,
+      contact: $("#f-contact").value.trim(),
+      phone: $("#f-phone").value.trim(),
+      email: $("#f-email").value.trim(),
+      category: $("#f-cat").value.trim(),
+      address: $("#f-addr").value.trim(),
+    };
+    if (editingId) {
+      suppliers = suppliers.map((s) => (s.id === editingId ? { ...s, ...vals } : s));
+    } else {
+      suppliers.push({
+        id: Date.now(),
+        ...vals,
+        category: vals.category || "Uncategorized",
+        rating: 4.5,
+        orders: 0,
+        pending: 0,
+        lastOrder: new Date().toISOString().slice(0, 10),
+      });
+    }
+    closeOverlay();
+    renderGrid();
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeOverlay();
+  });
+  closeModal.addEventListener("click", closeOverlay);
+  cancelBtn.addEventListener("click", closeOverlay);
+  addBtn.addEventListener("click", openAdd);
+
+  searchInput.addEventListener("input", (e) => {
+    query = e.target.value;
+    renderGrid();
+  });
+
+  menuToggle.addEventListener("click", () => {
+    sidebar.classList.add("open");
+    backdropNav.classList.add("show");
+  });
+  backdropNav.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    backdropNav.classList.remove("show");
+  });
+
+  function setDark(val) {
+    dark = val;
+    document.documentElement.classList.toggle("dark", dark);
+    lightBtn.classList.toggle("on", !dark);
+    darkBtn.classList.toggle("on", dark);
+  }
+  lightBtn.addEventListener("click", () => setDark(false));
+  darkBtn.addEventListener("click", () => setDark(true));
+
+  renderNav();
+  renderGrid();
+})();
+</script>
+</body>
+</html> -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suppliers — eVentory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="dashboard-layout.css" />
+    <link rel="stylesheet" href="supplier.css" />
+  </head>
+  <body>
+    <div id="page" data-page="supplier" data-title="Suppliers" data-subtitle="">
+
+      <template data-page-actions>
+        <button type="button" class="btn btn-primary" id="add-supplier-btn">+ Add Supplier</button>
+      </template>
+
+      <p class="supplier-count-text" id="supplier-count-text"></p>
+
+      <div class="panel">
+        <div class="table-toolbar">
+          <label class="table-search">
+            <span class="search-icon" data-icon="search"></span>
+            <input type="search" id="supplier-search" placeholder="Search by name, contact, or category..." />
+          </label>
+        </div>
+
+        <div class="suppliers-grid" id="suppliers-grid"></div>
+      </div>
+    </div>
+
+    <!-- Shared modal -->
+    <div class="modal-overlay" id="modal-overlay" hidden>
+      <div class="modal-box" id="modal-box" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <h3 class="modal-title" id="modal-title">Title</h3>
+          <button type="button" class="modal-close" id="modal-close">
+            <span data-p-icon="close"></span>
+          </button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+      </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="dashboard-layout.js"></script>
+    <script src="supplier.js"></script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      eVentory | Lightweight Inventory & Sales Management for African SMEs
+    </title>
+
+    <!-- Google Font -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Phosphor Icons -->
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+
+    <link rel="stylesheet" href="checkEmail.css" />
+  </head>
+  <body>
+    <main class="page">
+      <!-- Header Section -->
+      <header class="page-header">
+        <a href="forgot-password.html" class="back-btn">
+          <i class="ph ph-arrow-left"></i>
+        </a>
+        <img src="Asset/logo.png" alt="eVentory Logo" />
+      </header>
+
+      <!-- Main Card Body -->
+      <section class="email-card">
+        <img
+          class="illustration"
+          src="Asset/email-send-image.png"
+          alt="Illustration of a Paper Plane Depicting a Successfully Sent Email"
+        />
+        <div class="card-text">
+          <h2 class="text-header">Check your email</h2>
+
+          <p class="text-paragraph">
+            If an account exists for
+            <span class="email-placeholder">babatunde@example.com</span>, we’ve
+            sent you a password reset link.
+          </p>
+        </div>
+      </section>
+
+      <!-- Buttons -->
+
+      <section class="actions">
+        <button class="secondary-btn">
+          <i class="ph ph-envelope-simple"></i> Open email app
+        </button>
+
+        <button class="primary-btn">
+          Resend email (<span class="resend-btn">60</span>s)
+        </button>
+      </section>
+
+      <!-- Footer -->
+
+      <footer>
+        <a href="loginPage.html" class="back-login"> Back to login </a>
+      </footer>
+    </main>
+    <script src="checkEmail.js"></script>
+  </body>
+</html>
