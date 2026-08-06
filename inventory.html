@@ -1,3 +1,5 @@
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -17,28 +19,147 @@
     <div id="page" data-page="inventory" data-title="Inventory">
       <nav class="inv-tabs" id="inv-tabs" aria-label="Inventory sections"></nav>
 
+      <!-- Stock Overview KPI Cards -->
       <section class="inv-kpis" id="inv-kpis" aria-label="Inventory summary"></section>
 
-      <section class="panel inv-panel">
-        <div class="inv-panel-head">
-          <h2 class="inv-panel-title" id="inv-panel-title">All Stock Levels</h2>
-          <div class="inv-legend" id="inv-legend"></div>
+      <!-- Main View Panel -->
+      <section class="panel inv-panel" id="inv-panel">
+        <!-- Stock Overview Table View -->
+        <div id="view-overview" class="inv-view">
+          <div class="inv-panel-head">
+            <h2 class="inv-panel-title">All Stock Levels</h2>
+            <div class="inv-legend" id="inv-legend"></div>
+          </div>
+          <div class="inv-table-wrap">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th>PRODUCT</th>
+                  <th>CATEGORY</th>
+                  <th>STOCK LEVEL</th>
+                  <th>MIN. STOCK</th>
+                  <th>VALUE</th>
+                  <th>STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="inv-body"></tbody>
+            </table>
+          </div>
         </div>
-        <div class="inv-table-wrap">
-          <table class="inv-table">
-            <thead>
-              <tr>
-                <th>PRODUCT</th>
-                <th>CATEGORY</th>
-                <th>STOCK LEVEL</th>
-                <th>MIN. STOCK</th>
-                <th>VALUE</th>
-                <th>STATUS</th>
-              </tr>
-            </thead>
-            <tbody id="inv-body"></tbody>
-          </table>
+
+        <!-- Stock Adjustment View -->
+        <div id="view-adjustment" class="inv-view" hidden>
+          <div class="adj-grid">
+            <div class="adj-card">
+              <h2 class="adj-title">Stock Adjustment</h2>
+              <form id="adj-form" class="adj-form">
+                <div class="adj-field">
+                  <label for="adj-product">PRODUCT *</label>
+                  <select id="adj-product" required>
+                    <option value="">Select a product...</option>
+                  </select>
+                </div>
+                <div class="adj-field">
+                  <label>ADJUSTMENT TYPE *</label>
+                  <div class="adj-type-group">
+                    <button type="button" class="adj-type-btn is-active" data-type="IN">
+                      <span class="adj-type-icon">↑</span> Stock In
+                    </button>
+                    <button type="button" class="adj-type-btn" data-type="OUT">
+                      <span class="adj-type-icon">↓</span> Stock Out
+                    </button>
+                    <button type="button" class="adj-type-btn" data-type="ADJUST">
+                      <span class="adj-type-icon">↺</span> Adjustment
+                    </button>
+                  </div>
+                </div>
+                <div class="adj-field">
+                  <label for="adj-qty">QUANTITY *</label>
+                  <input type="number" id="adj-qty" min="1" placeholder="Enter quantity" required />
+                </div>
+                <div class="adj-field">
+                  <label for="adj-reason">REASON</label>
+                  <select id="adj-reason">
+                    <option value="New stock from supplier">Purchase from supplier</option>
+                    <option value="Damaged during delivery">Damaged goods removed</option>
+                    <option value="Expired stock">Expired stock</option>
+                    <option value="Stock audit correction">Stock audit correction</option>
+                  </select>
+                </div>
+                <div class="adj-field">
+                  <label for="adj-note">NOTE (OPTIONAL)</label>
+                  <input type="text" id="adj-note" placeholder="Additional details..." />
+                </div>
+                <div id="adj-alert" class="adj-alert" hidden>Enter a quantity to proceed.</div>
+                <button type="submit" id="adj-submit" class="adj-submit-btn">✓ Save Adjustment</button>
+              </form>
+            </div>
+
+            <div class="adj-side">
+              <div class="adj-card">
+                <h3 class="adj-subtitle">Preview</h3>
+                <div class="adj-preview-box">
+                  <div class="adj-preview-item">
+                    <span class="adj-preview-label">CURRENT</span>
+                    <span class="adj-preview-val" id="prev-current">--</span>
+                  </div>
+                  <span class="adj-preview-arrow">→</span>
+                  <div class="adj-preview-item is-new">
+                    <span class="adj-preview-label">NEW</span>
+                    <span class="adj-preview-val" id="prev-new">--</span>
+                  </div>
+                </div>
+              </div>
+              <div class="adj-card">
+                <h3 class="adj-subtitle">Recent Adjustments</h3>
+                <div class="adj-recent-list" id="adj-recent-list">
+                  <p class="inv-empty">No recent adjustments logged.</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Stock History View -->
+        <div id="view-history" class="inv-view" hidden>
+          <div class="history-toolbar">
+            <div class="history-search-wrap">
+              <input type="text" id="history-search" class="history-search" placeholder="Search stock history..." />
+            </div>
+            <button type="button" class="history-export-btn" id="history-export">⤓ Export</button>
+          </div>
+          <div class="inv-table-wrap">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th>DATE</th>
+                  <th>PRODUCT</th>
+                  <th>TYPE</th>
+                  <th>QTY CHANGE</th>
+                  <th>BEFORE → AFTER</th>
+                  <th>REASON</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Low Stock View -->
+        <div id="view-low" class="inv-view" hidden>
+          <div id="low-banner" class="low-banner" hidden></div>
+          <div id="low-list" class="low-list"></div>
+        </div>
+
+        <!-- Reorder Suggestions View -->
+        <div id="view-reorder" class="inv-view" hidden>
+          <div class="reorder-info-banner">
+            ℹ Suggested reorder quantities are based on stock thresholds and minimum levels.
+          </div>
+          <div id="reorder-list" class="reorder-list"></div>
+        </div>
+
+        <!-- Empty State Fallback -->
         <p class="inv-empty" id="inv-empty" hidden>No items match this view.</p>
       </section>
     </div>
