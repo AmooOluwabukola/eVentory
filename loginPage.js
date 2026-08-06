@@ -142,6 +142,7 @@ async function loginUser(email, password) {
 
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("store", JSON.stringify(user.storeName));
 
     if (rememberMe.checked) {
       localStorage.setItem("rememberedEmail", email);
