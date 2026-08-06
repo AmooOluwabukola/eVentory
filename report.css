@@ -1,516 +1,348 @@
-/* ===================================================
-   REPORT PAGE
-   =================================================== */
-
-.reports-page {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* ===========================
-   Utilities
-=========================== */
-
-.hidden {
-  display: none !important;
-}
-
-.fade-in {
-  animation: fadeIn 0.35s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* Loading Overlay */
-
-#loadingOverlay {
-  position: fixed;
-
-  inset: 0;
-
-  display: grid;
-
-  place-items: center;
-
-  background: rgba(255, 255, 255, 0.8);
-
-  backdrop-filter: blur(4px);
-
-  z-index: 9999;
-}
-
-.loading-box {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  gap: 16px;
-
-  padding: 28px 40px;
-
-  background: var(--panel);
-
-  border-radius: 18px;
-
-  box-shadow: var(--shadow-panel);
-}
-
-.spinner {
-  width: 40px;
-
-  height: 40px;
-
-  border: 4px solid rgba(0, 0, 0, 0.1);
-
-  border-top-color: var(--brand);
-
-  border-radius: 50%;
-
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-/* ===========================
-   Toolbar
-=========================== */
+/* eVentory — Reports page.
+   Built entirely on the design tokens defined in dashboard-layout.css
+   (--brand, --panel, --line, --amber, --green, --rose, --teal, etc.)
+   so it stays in sync automatically with light/dark theme and any future
+   token changes — no new colors are introduced here except the two extra
+   chart tones noted below. */
 
 .report-toolbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  padding: 18px 22px;
-}
-
-.filter-group {
-  display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-}
-
-.filter-btn {
-  padding: 10px 20px;
-
-  border-radius: 999px;
-
-  border: 1px solid var(--line);
-
-  background: var(--panel);
-
-  color: var(--ink-soft);
-
-  font-weight: 600;
-
-  transition: 0.25s;
-}
-
-.filter-btn:hover {
-  border-color: var(--brand);
-
-  color: var(--brand);
-}
-
-.filter-btn.active {
-  background: var(--brand);
-
-  color: white;
-
-  border-color: var(--brand);
-}
-
-/* ===========================
-   Summary Grid
-=========================== */
-
-.summary-grid {
-  display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 22px;
-}
-
-.summary-card {
-  position: relative;
-
-  display: flex;
-
-  flex-direction: column;
-
+  align-items: center;
   justify-content: space-between;
-
-  min-height: 170px;
-
-  padding: 24px;
-
-  border-radius: var(--r-card);
-
-  background: var(--panel);
-
-  box-shadow: var(--shadow-panel);
-
-  transition: 0.25s;
-
-  overflow: hidden;
+  gap: 14px;
 }
 
-.summary-card:hover {
-  transform: translateY(-4px);
-}
-
-.summary-card h4 {
-  color: var(--muted);
-
-  font-size: 0.88rem;
-
-  font-weight: 600;
-
-  margin-bottom: 12px;
-}
-
-.summary-card h2 {
-  font-size: 2rem;
-
-  font-weight: 700;
-
-  line-height: 1.1;
-
-  color: var(--ink);
-}
-
-.summary-card p {
-  color: var(--muted);
-
-  font-size: 0.85rem;
-
-  margin-top: 6px;
-}
-
-.summary-card small {
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-  margin-top: 18px;
-
-  color: var(--green);
-
-  font-weight: 600;
-}
-
-.summary-icon {
-  position: absolute;
-
-  top: 22px;
-
-  right: 22px;
-
-  width: 48px;
-
-  height: 48px;
-
-  border-radius: 50%;
-
-  display: grid;
-
-  place-items: center;
-
-  font-size: 1.2rem;
-}
-
-/* ===========================
-   Skeleton Loading
-=========================== */
-
-.skeleton {
-  position: relative;
-
-  overflow: hidden;
-
-  background: #ececec;
-
-  border-radius: 8px;
-}
-
-[data-theme="dark"] .skeleton {
-  background: #2b2b34;
-}
-
-.skeleton::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  transform: translateX(-100%);
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
-
-  animation: skeleton 1.2s infinite;
-}
-
-@keyframes skeleton {
-  to {
-    transform: translateX(100%);
-  }
-}
-
-/* ===========================
-   Charts
-=========================== */
-
-.chart-panel {
-  padding: 24px;
-}
-
-.chart-panel canvas {
-  width: 100% !important;
-
-  height: 420px !important;
-}
-
-.chart-wrapper {
-  position: relative;
-
-  width: 100%;
-
-  min-height: 420px;
-}
-
-.chart-wrapper canvas {
-  width: 100% !important;
-
-  height: 420px !important;
-}
-
-/* ===========================
-   Empty States
-=========================== */
-
-.empty-state {
-  position: absolute;
-
-  inset: 0;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  text-align: center;
-
-  color: var(--muted);
-
-  font-size: 0.95rem;
-
-  background: var(--panel);
-}
-
-/* ===========================
-   Bottom Analytics
-=========================== */
-
-.analytics-grid {
-  display: grid;
-
-  grid-template-columns: 2fr 1fr;
-
-  gap: 22px;
-}
-
-.analytics-grid > .panel {
-  padding: 22px;
-}
-
-.section-heading {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  margin-bottom: 22px;
-}
-
-.section-heading h2 {
-  font-size: 1.1rem;
-
-  font-weight: 700;
-}
-
-.section-heading p {
-  color: var(--muted);
-
-  font-size: 0.9rem;
-}
-
-/* ===========================
-   Products
-=========================== */
-
-.products-list {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 22px;
-}
-
-.product {
-  display: flex;
-
-  flex-direction: column;
-
+/* ---------- Period tabs (Weekly / Monthly / Yearly) ---------- */
+/* Individual chip buttons sitting directly on the panel (not one grouped
+   segmented control) — matches the screenshot. */
+.period-tabs {
+  display: inline-flex;
   gap: 10px;
 }
 
-.product-header {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
+.period-btn {
+  height: 36px;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--panel);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
 }
 
-.product-name {
+.period-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.period-btn.is-active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(100, 21, 234, 0.24);
+}
+
+.export-pdf-btn {
+  gap: 8px;
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+/* ---------- Metric cards ---------- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--panel-gap);
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.metric-value {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--ink);
+}
+
+.metric-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footnote-mark {
+  cursor: help;
+  color: var(--faint);
+}
+
+.metric-trend {
+  margin-top: 2px;
+  font-size: 13px;
   font-weight: 600;
 }
 
-.product-value {
+.metric-trend.is-up {
+  color: var(--green);
+}
+.metric-trend.is-down {
+  color: var(--red);
+}
+
+/* ---------- Shared panel heading row ---------- */
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.panel-subtitle {
+  margin-top: -14px;
+  margin-bottom: 16px;
+  font-size: 13px;
   color: var(--muted);
 }
 
-.progress {
-  width: 100%;
+.chart-legend {
+  display: flex;
+  gap: 18px;
+}
 
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.legend-dot {
+  width: 9px;
   height: 9px;
+  border-radius: 50%;
+}
 
-  background: var(--line);
+.chart-holder {
+  width: 100%;
+  min-height: 250px;
+}
 
-  border-radius: 999px;
+.chart-holder .chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
+.chart-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* ---------- Top performing products + Sales by category ---------- */
+.report-split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--panel-gap);
+  align-items: start;
+}
+
+.top-products {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.top-product-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.top-product-row.is-loading,
+.top-product-row.is-empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.product-row-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.product-rank {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--amber-tint);
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.product-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.product-amount {
+  flex: none;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.product-bar-track {
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--row-line);
   overflow: hidden;
 }
 
-.progress span {
-  display: block;
-
-  width: 0;
-
+.product-bar-fill {
   height: 100%;
-
-  border-radius: 999px;
-
-  background: linear-gradient(90deg, var(--brand), #9d62ff);
-
-  transition: width 0.8s ease;
+  border-radius: var(--r-pill);
+  background: var(--amber);
 }
 
-#lastUpdated {
-  font-size: 0.82rem;
+.product-share {
+  align-self: flex-end;
+  font-size: 12.5px;
+  color: var(--faint);
+}
 
+/* ---------- Sales by category ---------- */
+.category-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.category-pie-holder {
+  width: 100%;
+  max-width: 260px;
+}
+
+.category-pie-holder .chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.category-legend {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.category-legend-row.is-loading,
+.category-legend-row.is-empty {
   color: var(--muted);
 }
 
-/* ===========================
-   Responsive
-=========================== */
+.category-dot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+}
 
-@media (max-width: 1200px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
+.category-legend-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink-soft);
+}
+
+.category-legend-value {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (max-width: 1180px) {
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .analytics-grid {
+@media (max-width: 1024px) {
+  .report-split {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
-  .summary-grid {
+@media (max-width: 560px) {
+  .metric-grid {
     grid-template-columns: 1fr;
   }
 
   .report-toolbar {
     flex-direction: column;
-
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .chart-wrapper {
-    min-height: 330px;
+  .period-tabs {
+    justify-content: space-between;
   }
 
-  .chart-wrapper canvas {
-    height: 330px !important;
-  }
-}
-
-@media (max-width: 520px) {
-  .filter-group {
-    width: 100%;
-  }
-
-  .filter-btn {
+  .period-btn {
     flex: 1;
-  }
-
-  .summary-card h2 {
-    font-size: 1.55rem;
-  }
-
-  .chart-wrapper {
-    min-height: 280px;
-  }
-
-  .chart-wrapper canvas {
-    height: 280px !important;
-  }
-}
-
-/* Print Styling used for Export */
-
-@media print {
-  body {
-    background: white;
-  }
-
-  .sidebar,
-  .topbar,
-  .report-toolbar,
-  .page-actions {
-    display: none !important;
-  }
-
-  .panel {
-    box-shadow: none;
-
-    border: 1px solid #ddd;
   }
 }

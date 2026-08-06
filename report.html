@@ -3,166 +3,252 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Reports — eVentory</title>
-
+    <title>Orders — eVentory</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
     <link rel="stylesheet" href="dashboard-layout.css" />
     <link rel="stylesheet" href="report.css" />
+    <!-- jsPDF + autotable: used only for the client-side "Export Reports" / "Export PDF"
+    buttons (see NOTE in report.js — there is no backend export endpoint documented
+    in the API guide, so this generates the PDF entirely in the browser). -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   </head>
-
   <body>
-    <div
-      id="page"
-      data-page="report"
-      data-title="Reports"
-      data-subtitle="Business performance insights"
-    >
-      <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="hidden">
-        <div class="loading-box">
-          <div class="spinner"></div>
+      <!-- dashboard-layout.js reads #page's data-* attributes, builds the shared
+       sidebar/topbar shell around this element, then unwraps its children
+       into #app-content. Nothing inside #page should assume the shell markup
+       exists yet at parse time. -->
+      <div
+        id="page"
+        data-page="report"
+        data-title="Reports"
+        data-subtitle="Business performance insights"
+      >
+        <!-- Slotted into .page-actions (top-right of the page header) by dashboard-layout.js -->
+        <template data-page-actions>
+          <button type="button" class="btn btn-primary" id="export-reports-btn">
+            Export Reports
+          </button>
+        </template>
 
-          <p>Loading reports...</p>
-        </div>
-      </div>
-
-      <template data-page-actions>
-        <button class="btn btn-secondary" id="exportReport" type="button">
-          Export Report
-        </button>
-      </template>
-
-      <section class="reports-page">
-        <!-- ========================= -->
-        <!-- FILTER BAR -->
-        <!-- ========================= -->
-
-        <section class="panel report-toolbar">
-          <div class="filter-group" role="tablist">
+        <!-- ===================== Period toggle + Export PDF toolbar ===================== -->
+        <div class="panel report-toolbar">
+          <div class="period-tabs" role="group" aria-label="Report period">
+            <button type="button" class="period-btn" data-period="weekly">
+              Weekly
+            </button>
             <button
-              class="filter-btn active"
               type="button"
+              class="period-btn is-active"
               data-period="monthly"
             >
               Monthly
             </button>
-
-            <button class="filter-btn" type="button" data-period="weekly">
-              Weekly
-            </button>
-
-            <button class="filter-btn" type="button" data-period="yearly">
+            <button type="button" class="period-btn" data-period="yearly">
               Yearly
             </button>
           </div>
-        </section>
+          <button
+            type="button"
+            class="pill-btn export-pdf-btn"
+            id="export-pdf-btn"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 3v12" />
+              <path d="m7 10.5 5 5 5-5" />
+              <path d="M4 19.5h16" />
+            </svg>
+            <span>Export PDF</span>
+          </button>
+        </div>
 
-        <!-- ========================= -->
-        <!-- KPI CARDS -->
-        <!-- ========================= -->
-
-        <section class="summary-grid">
-          <article
-            class="summary-card"
-            id="grossRevenueCard"
-            aria-live="polite"
-          ></article>
-
-          <article
-            class="summary-card"
-            id="netProfitCard"
-            aria-live="polite"
-          ></article>
-
-          <article
-            class="summary-card"
-            id="unitsSoldCard"
-            aria-live="polite"
-          ></article>
-
-          <article
-            class="summary-card"
-            id="averageOrderCard"
-            aria-live="polite"
-          ></article>
-        </section>
-
-        <!-- ========================= -->
-        <!-- REVENUE CHART -->
-        <!-- ========================= -->
-
-        <section class="panel chart-panel">
-          <div class="section-heading">
-            <div>
-              <h2>Revenue Overview</h2>
-
-              <p>Revenue, Expenses & Profit</p>
+        <!-- ===================== Metric cards ===================== -->
+        <div class="metric-grid">
+          <div class="panel metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Gross Revenue</span>
+              <span class="tile tile-amber">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m3.4 16.6 5.4-5.4 3.8 3.8 8-8" />
+                  <path d="M15.2 7h5.4v5.4" />
+                </svg>
+              </span>
             </div>
-
-            <div id="lastUpdated"></div>
+            <p class="metric-value" id="metric-gross-revenue">—</p>
+            <p class="metric-sub" id="metric-gross-revenue-sub">Loading…</p>
+            <p class="metric-trend" id="metric-gross-revenue-trend" hidden></p>
           </div>
 
-          <div class="chart-wrapper">
-            <canvas id="revenueChart" aria-label="Revenue Chart"> </canvas>
+          <div class="panel metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Net Profit</span>
+              <span class="tile tile-purple">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"
+                  />
+                </svg>
+              </span>
+            </div>
+            <p class="metric-value" id="metric-net-profit">—</p>
+            <p class="metric-sub" id="metric-net-profit-sub">
+              After expenses<sup
+                class="footnote-mark"
+                title="Net profit = Revenue − cost of goods sold (product costPrice × qty). The API has no dedicated expenses/profit endpoint or true operating-expenses figure yet — see report.js NOTE."
+                >†</sup
+              >
+            </p>
+            <p class="metric-trend" id="metric-net-profit-trend" hidden></p>
+          </div>
 
-            <div class="empty-state hidden" id="revenueEmpty">
-              No revenue data available.
+          <div class="panel metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Units Sold</span>
+              <span class="tile tile-teal">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2.7 20.8 7.3v9.4L12 21.3 3.2 16.7V7.3z" />
+                  <path d="m3.4 7.4 8.6 4.6 8.6-4.6" />
+                  <path d="M12 12v9.3" />
+                </svg>
+              </span>
+            </div>
+            <p class="metric-value" id="metric-units-sold">—</p>
+            <p class="metric-sub" id="metric-units-sold-sub">All products</p>
+            <p class="metric-trend" id="metric-units-sold-trend" hidden></p>
+          </div>
+
+          <div class="panel metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Avg. Order Value</span>
+              <span class="tile tile-green">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="9.6" cy="19.4" r="1.6" />
+                  <circle cx="17.4" cy="19.4" r="1.6" />
+                  <path d="M2.6 3.4h2.2l2.4 11.4h11.6l2.2-8.2H6" />
+                </svg>
+              </span>
+            </div>
+            <p class="metric-value" id="metric-aov">—</p>
+            <p class="metric-sub" id="metric-aov-sub">Per transaction</p>
+            <p class="metric-trend" id="metric-aov-trend" hidden></p>
+          </div>
+        </div>
+
+        <!-- ===================== Revenue / Expenses / Profit chart ===================== -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title" id="trend-chart-title">
+              Revenue, Expenses &amp; Profit
+            </h2>
+            <div class="chart-legend">
+              <span class="legend-item"
+                ><span
+                  class="legend-dot"
+                  style="background: var(--green)"
+                ></span
+                >Revenue</span
+              >
+              <span class="legend-item"
+                ><span class="legend-dot" style="background: #f6dfb4"></span
+                >Expenses</span
+              >
+              <span class="legend-item"
+                ><span class="legend-dot" style="background: #e2661f"></span
+                >Profit</span
+              >
             </div>
           </div>
-        </section>
+          <div id="trend-chart" class="chart-holder" aria-live="polite"></div>
+          <p class="chart-note" id="trend-chart-note"></p>
+        </div>
 
-        <!-- ========================= -->
-        <!-- ANALYTICS -->
-        <!-- ========================= -->
+        <!-- ===================== Top products + Sales by category ===================== -->
+        <div class="report-split">
+          <div class="panel">
+            <h2 class="panel-title">Top Performing Products</h2>
+            <ol class="top-products" id="top-products-list">
+              <li class="top-product-row is-loading">Loading top products…</li>
+            </ol>
+          </div>
 
-        <section class="analytics-grid">
-          <!-- PRODUCTS -->
-
-          <article class="panel">
-            <div class="section-heading">
-              <h2>Top Selling Products</h2>
+          <div class="panel">
+            <h2 class="panel-title">Sales by Category</h2>
+            <p class="panel-subtitle">Revenue share</p>
+            <div class="category-body">
+              <div
+                id="category-pie"
+                class="category-pie-holder"
+                aria-live="polite"
+              ></div>
+              <ul class="category-legend" id="category-legend">
+                <li class="category-legend-row is-loading">
+                  Loading categories…
+                </li>
+              </ul>
             </div>
-
-            <div id="topProducts" class="products-list"></div>
-
-            <div id="productsEmpty" class="empty-state hidden">
-              No product sales recorded.
-            </div>
-          </article>
-
-          <!-- CATEGORY -->
-
-          <article class="panel">
-            <div class="section-heading">
-              <h2>Sales by Category</h2>
-            </div>
-
-            <div class="chart-wrapper">
-              <canvas id="categoryChart"> </canvas>
-
-              <div id="categoryEmpty" class="empty-state hidden">
-                No category data available.
-              </div>
-            </div>
-          </article>
-        </section>
-      </section>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="api.js"></script>
-
+    <script src="charts.js"></script>
     <script src="dashboard-layout.js"></script>
-
     <script src="report.js"></script>
   </body>
 </html>

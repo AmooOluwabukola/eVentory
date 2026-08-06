@@ -1,14 +1,14 @@
-/* eVentory — Orders / Sales page script.
- * Tries the real API first (GET/POST /sales, GET /products — these map
- * directly to the backend's documented Sale/SaleItem/Product models),
- * and falls back to realistic mock data if a call fails so the page
- * stays usable while endpoints are being confirmed.
+/* eVentory — Orders page script (Sales History + Record Sale).
+ * Talks to the real API: GET/POST /sales, GET /products (Record Sale
+ * product picker). Attendant name is resolved only for the currently
+ * logged-in user (via localStorage "user") — there's no endpoint to
+ * look up other staff members' names from a userId. No mock-data
+ * fallback.
  */
 
 (function () {
   "use strict";
 
-  // ---------- Icons not in the shared dashboard-layout.js library ----------
   const EXTRA_ICON_PATHS = {
     eye: '<path d="M2 10s3-6 8-6 8 6 8 6-3 6-8 6-8-6-8-6z"/><circle cx="10" cy="10" r="2.4"/>',
     receipt: '<path d="M5 2.6h10v14.8l-1.8-1.3-1.9 1.3-1.8-1.3-1.9 1.3-1.8-1.3-1.8 1.3z"/><path d="M7.4 7h5.2"/><path d="M7.4 10.4h3.4"/>',
@@ -69,54 +69,78 @@
     return "₦" + amount.toLocaleString("en-NG");
   }
 
-  // ---------- Mock fallback data (matches the Figma screenshots) ----------
-  const MOCK_PRODUCTS = [
-    { id: "p1", name: "Basmati Rice 5kg", unitPrice: 4500 },
-    { id: "p2", name: "Vegetable Oil 1L", unitPrice: 2200 },
-    { id: "p3", name: "Indomie Chicken 70g", unitPrice: 200 },
-    { id: "p4", name: "Coca-Cola 50cl", unitPrice: 350 },
-    { id: "p5", name: "Peak Milk Tin", unitPrice: 1500 },
-  ];
+  function formatDate(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" });
+  }
 
-  const MOCK_SALES = [
-    {
-      id: "S001", date: "2025-07-27", customer: "Walk-in", attendant: "Emeka Obi",
-      paymentMethod: "cash", status: "completed", total: 9000,
-      items: [{ name: "Basmati Rice 5kg", quantity: 2, unitPrice: 4500 }],
-    },
-    {
-      id: "S002", date: "2025-07-27", customer: "Mrs. Fatima Aliyu", attendant: "Amina Bello",
-      paymentMethod: "card", status: "completed", total: 9850,
-      items: [
-        { name: "Vegetable Oil 1L", quantity: 2, unitPrice: 2200 },
-        { name: "Peak Milk Tin", quantity: 3, unitPrice: 1483.33 },
-      ],
-    },
-    {
-      id: "S003", date: "2025-07-27", customer: "Mr. Chukwudi Nwosu", attendant: "Emeka Obi",
-      paymentMethod: "credit", status: "credit", total: 6800,
-      items: [{ name: "Basmati Rice 5kg", quantity: 1, unitPrice: 4500 }, { name: "Vegetable Oil 1L", quantity: 1, unitPrice: 2300 }],
-    },
-    {
-      id: "S004", date: "2025-07-26", customer: "Walk-in", attendant: "Amina Bello",
-      paymentMethod: "transfer", status: "completed", total: 12700,
-      items: [{ name: "Peak Milk Tin", quantity: 4, unitPrice: 1500 }, { name: "Coca-Cola 50cl", quantity: 20, unitPrice: 320 }],
-    },
-    {
-      id: "S005", date: "2025-07-26", customer: "Mrs. Ngozi Adeyemi", attendant: "Emeka Obi",
-      paymentMethod: "cash", status: "refunded", total: 7400,
-      items: [{ name: "Basmati Rice 5kg", quantity: 1, unitPrice: 4500 }, { name: "Indomie Chicken 70g", quantity: 5, unitPrice: 580 }],
-    },
-    {
-      id: "S006", date: "2025-07-25", customer: "Walk-in", attendant: "Chidi Eze",
-      paymentMethod: "cash", status: "completed", total: 4080,
-      items: [{ name: "Coca-Cola 50cl", quantity: 12, unitPrice: 340 }],
-    },
-  ];
+  function formatDateTime(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toLocaleString("en-NG", { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
 
-  let salesSource = "local";
+  // The backend id is a full UUID — display a short, human-friendly form
+  // everywhere, but always key lookups off the full id.
+  function shortOrderId(id) {
+    if (!id) return "—";
+    const first = String(id).split("-")[0];
+    return "ORD-" + first.toUpperCase();
+  }
+
+  function showToast(message, isError) {
+    let toast = document.querySelector(".save-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "save-toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.toggle("is-error", !!isError);
+    toast.classList.add("is-visible");
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => toast.classList.remove("is-visible"), 2600);
+  }
+
+  // The API wraps list responses as { status, message, data: { <key>: [...] } }
+  // (sometimes flattened to { data: [...] }). Stay defensive about the exact
+  // nesting so a well-formed response never gets misread as a failure.
+  function extractList(response, key) {
+    if (Array.isArray(response)) return response;
+    if (Array.isArray(response?.data)) return response.data;
+    if (Array.isArray(response?.data?.[key])) return response.data[key];
+    if (Array.isArray(response?.[key])) return response[key];
+    return null;
+  }
+
   let salesCache = [];
   let productsCache = [];
+
+  // ---------- Attendant lookup ----------
+  // There's no endpoint that lists all users, so there's no way to resolve
+  // *other* staff members' names from a userId alone. The only identity we
+  // actually have on hand is whoever is currently logged in (localStorage
+  // "user", set at login) — so we can only label a sale as "You" when its
+  // userId matches the current session, and show "—" for everyone else.
+  function getCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null") || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function attendantName(userId) {
+    if (!userId) return "—";
+    const me = getCurrentUser();
+    if (me && me.id != null && String(me.id) === String(userId)) {
+      return me.fullName || me.name || "You";
+    }
+    return "—";
+  }
 
   // ---------- Tabs ----------
   function setupTabs() {
@@ -137,20 +161,50 @@
 
   // ---------- Sales History: load + render ----------
   async function loadSales() {
-    if (window.EvApi) {
-      try {
-        const response = await EvApi.json("/sales");
-        salesCache = response.data || response;
-        salesSource = "api";
-        renderAll();
-        return;
-      } catch (err) {
-        /* fall back below */
-      }
+    if (!window.EvApi) {
+      salesCache = [];
+      renderAll();
+      return;
     }
-    salesSource = "local";
-    salesCache = MOCK_SALES;
-    renderAll();
+
+    try {
+      const response = await EvApi.json("/sales", { method: "GET" });
+      const list = extractList(response, "sales");
+      if (!Array.isArray(list)) throw new Error("Unexpected /sales response shape");
+      salesCache = list.map(normalizeSale);
+      renderAll();
+    } catch (err) {
+      salesCache = [];
+      renderAll();
+      showToast("Couldn't load sales from the server.", true);
+    }
+  }
+
+  // Backend shape (confirmed): { id, userId, paymentMethod, totalAmount,
+  // note, createdAt, SaleItems: [{ quantity, unitPrice, Product: {name, sku} }] }.
+  // There is no "customer" or "status" field on the sale at all — both are
+  // derived/defaulted below rather than coming from the API.
+  function normalizeSale(s) {
+    const items = (s.SaleItems || []).map((it) => ({
+      name: it.Product?.name || "",
+      sku: it.Product?.sku || "",
+      quantity: Number(it.quantity) || 0,
+      unitPrice: Number(it.unitPrice) || 0,
+    }));
+
+    return {
+      id: s.id,
+      date: s.createdAt,
+      customer: s.customerName || "Walk-in", // not currently returned by the backend
+      userId: s.userId,
+      paymentMethod: s.paymentMethod,
+      // Best-guess display status — the backend has no status field yet,
+      // so "refunded" can never actually occur until one exists.
+      status: s.paymentMethod === "credit" ? "credit" : "completed",
+      total: Number(s.totalAmount) || 0,
+      note: s.note || "",
+      items,
+    };
   }
 
   function renderAll() {
@@ -189,25 +243,36 @@
       .join("");
   }
 
+  function getFilteredSales() {
+    const search = (document.getElementById("order-search")?.value || "").toLowerCase();
+    const statusFilter = document.getElementById("status-filter")?.value || "";
+
+    return salesCache.filter((s) => {
+      const matchesSearch =
+        !search ||
+        String(s.id || "").toLowerCase().includes(search) ||
+        shortOrderId(s.id).toLowerCase().includes(search) ||
+        (s.customer || "").toLowerCase().includes(search) ||
+        attendantName(s.userId).toLowerCase().includes(search);
+      const matchesStatus = !statusFilter || s.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }
+
   function renderTable() {
     const tbody = document.getElementById("orders-tbody");
     if (!tbody) return;
 
-    const search = (document.getElementById("order-search")?.value || "").toLowerCase();
+    const search = document.getElementById("order-search")?.value || "";
     const statusFilter = document.getElementById("status-filter")?.value || "";
-
-    const rows = salesCache.filter((s) => {
-      const matchesSearch =
-        !search ||
-        s.id.toLowerCase().includes(search) ||
-        (s.customer || "").toLowerCase().includes(search) ||
-        (s.attendant || "").toLowerCase().includes(search);
-      const matchesStatus = !statusFilter || s.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+    const rows = getFilteredSales();
 
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No sales found.</td></tr>';
+      const filtering = search || statusFilter;
+      tbody.innerHTML =
+        '<tr><td colspan="8" class="table-empty">' +
+        (filtering ? "No sales match your filters." : "No sales yet.") +
+        "</td></tr>";
       return;
     }
 
@@ -215,14 +280,14 @@
       .map((s) => {
         const itemCount = (s.items || []).reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
         return (
-          "<tr>" +
-          '<td class="cell-order-id">' + escapeHtml(s.id) + "</td>" +
-          "<td>" + escapeHtml(s.date) + "</td>" +
+          '<tr data-open="' + s.id + '">' +
+          '<td class="cell-order-id" title="' + escapeHtml(s.id) + '">' + escapeHtml(shortOrderId(s.id)) + "</td>" +
+          "<td>" + escapeHtml(formatDate(s.date)) + "</td>" +
           "<td>" + escapeHtml(s.customer || "Walk-in") + "</td>" +
           "<td>" + itemCount + (itemCount === 1 ? " item" : " items") + "</td>" +
           '<td class="cell-total">' + formatNaira(s.total) + "</td>" +
           '<td><span class="status-badge ' + s.status + '">' + escapeHtml(s.status) + "</span></td>" +
-          "<td>" + escapeHtml(s.attendant || "—") + "</td>" +
+          "<td>" + escapeHtml(attendantName(s.userId)) + "</td>" +
           '<td><div class="row-actions">' +
           '<button type="button" class="icon-action-btn" data-view="' + s.id + '" aria-label="View order">' + extraIcon("eye", 14) + '</button>' +
           '<button type="button" class="icon-action-btn" data-receipt="' + s.id + '" aria-label="View receipt">' + extraIcon("receipt", 14) + '</button>' +
@@ -233,14 +298,71 @@
       .join("");
   }
 
-  // ---------- Order detail drill-down ----------
+  // ---------- CSV export ----------
+  // Escapes a value for CSV: wraps in quotes and doubles any embedded
+  // quotes whenever the value itself contains a comma, quote, or newline.
+  function csvEscape(value) {
+    const str = value == null ? "" : String(value);
+    if (/[",\r\n]/.test(str)) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
+
+  function downloadCsv(content, filename) {
+    const blob = new Blob(["\uFEFF" + content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  // Exports exactly what's currently visible in the table — i.e. whatever
+  // search/status filter is applied — not the whole unfiltered salesCache.
+  function exportSalesToCsv() {
+    const rows = getFilteredSales();
+    if (!rows.length) {
+      showToast("No sales to export.", true);
+      return;
+    }
+
+    const headers = ["Order ID", "Date", "Customer", "Items", "Total (₦)", "Status", "Attendant"];
+    const lines = [headers.map(csvEscape).join(",")];
+
+    rows.forEach((s) => {
+      const itemCount = (s.items || []).reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+      lines.push(
+        [
+          shortOrderId(s.id),
+          formatDate(s.date),
+          s.customer || "Walk-in",
+          itemCount,
+          s.total,
+          s.status,
+          attendantName(s.userId),
+        ]
+          .map(csvEscape)
+          .join(",")
+      );
+    });
+
+    const filename = "sales-" + new Date().toISOString().slice(0, 10) + ".csv";
+    downloadCsv(lines.join("\r\n"), filename);
+    showToast("Exported " + rows.length + (rows.length === 1 ? " sale" : " sales") + " to CSV.");
+  }
+
+
   function showListView() {
     document.getElementById("history-list-view").hidden = false;
     document.getElementById("order-detail-view").hidden = true;
   }
 
   function showDetailView(orderId) {
-    const order = salesCache.find((s) => s.id === orderId);
+    const order = salesCache.find((s) => String(s.id) === String(orderId));
     if (!order) return;
 
     document.getElementById("history-list-view").hidden = true;
@@ -248,7 +370,7 @@
     detailView.hidden = false;
     detailView.dataset.currentOrder = orderId;
 
-    document.getElementById("detail-title").textContent = "Order " + order.id;
+    document.getElementById("detail-title").textContent = "Order " + shortOrderId(order.id);
 
     const itemsEl = document.getElementById("detail-items");
     itemsEl.innerHTML = (order.items || [])
@@ -256,7 +378,7 @@
         const lineTotal = item.quantity * item.unitPrice;
         return (
           '<div class="detail-item-row">' +
-          '<div><p class="detail-item-name">' + escapeHtml(item.name) + '</p>' +
+          '<div><p class="detail-item-name">' + escapeHtml(item.name || "—") + '</p>' +
           '<p class="detail-item-meta">' + formatNaira(item.unitPrice) + ' × ' + item.quantity + '</p></div>' +
           '<div class="detail-item-amount">' + formatNaira(lineTotal) + "</div>" +
           "</div>"
@@ -267,12 +389,12 @@
     document.getElementById("detail-total").textContent = formatNaira(order.total);
 
     const infoRows = [
-      ["Order ID", order.id],
-      ["Date", order.date],
+      ["Order ID", shortOrderId(order.id)],
+      ["Date", formatDateTime(order.date)],
       ["Customer", order.customer || "Walk-in"],
-      ["Attendant", order.attendant || "—"],
+      ["Attendant", attendantName(order.userId)],
       ["Payment", order.status === "credit" ? "Pending" : "Paid"],
-      ["Status", order.status.charAt(0).toUpperCase() + order.status.slice(1)],
+      ["Status", (order.status || "").charAt(0).toUpperCase() + (order.status || "").slice(1)],
     ];
 
     document.getElementById("sale-info-list").innerHTML = infoRows
@@ -285,7 +407,7 @@
 
   // ---------- Receipt modal ----------
   function openReceipt(orderId) {
-    const order = salesCache.find((s) => s.id === orderId);
+    const order = salesCache.find((s) => String(s.id) === String(orderId));
     if (!order) return;
 
     const store = (function () {
@@ -300,7 +422,7 @@
       .map(
         (item) =>
           '<div class="receipt-line"><span>' +
-          escapeHtml(item.name) +
+          escapeHtml(item.name || "—") +
           " × " +
           item.quantity +
           "</span><span>" +
@@ -313,7 +435,7 @@
       '<div class="receipt-logo-row">' + extraIcon("invoice", 20) + " Eventory</div>" +
       '<p class="receipt-store-name">' + escapeHtml(store.name || "Your Store") + "</p>" +
       '<p class="receipt-store-address">' + escapeHtml(store.address || "") + "</p>" +
-      '<p class="receipt-meta">Receipt #' + escapeHtml(order.id) + " · " + escapeHtml(order.date) + "</p>" +
+      '<p class="receipt-meta">Receipt #' + escapeHtml(shortOrderId(order.id)) + " · " + escapeHtml(formatDate(order.date)) + "</p>" +
       itemsHtml +
       '<div class="receipt-total"><span>TOTAL</span><span>' + formatNaira(order.total) + "</span></div>" +
       '<p class="receipt-thanks">Thank you for shopping at ' + escapeHtml(store.name || "our store") + "!<br/>Powered by Eventory</p>";
@@ -332,22 +454,32 @@
     const select = document.getElementById("product-select");
     if (!select) return;
 
-    if (window.EvApi) {
-      try {
-        const response = await EvApi.json("/products");
-        productsCache = response.data || response;
-      } catch (err) {
-        productsCache = MOCK_PRODUCTS;
-      }
-    } else {
-      productsCache = MOCK_PRODUCTS;
+    if (!window.EvApi) {
+      productsCache = [];
+      select.innerHTML = '<option value="" disabled selected>Not connected to server</option>';
+      return;
     }
 
-    select.innerHTML =
-      '<option value="" disabled selected>Select a product</option>' +
-      productsCache
-        .map((p) => '<option value="' + p.id + '">' + escapeHtml(p.name) + " — " + formatNaira(p.unitPrice) + "</option>")
-        .join("");
+    try {
+      const response = await EvApi.json("/products", { method: "GET" });
+      const list = extractList(response, "products");
+      if (!Array.isArray(list)) throw new Error("Unexpected /products response shape");
+      productsCache = list;
+      select.innerHTML =
+        '<option value="" disabled selected>Select a product</option>' +
+        productsCache
+          .map(
+            (p) =>
+              '<option value="' + escapeHtml(p.id) + '">' +
+              escapeHtml(p.name) + " — " + formatNaira(p.unitPrice) +
+              "</option>"
+          )
+          .join("");
+    } catch (err) {
+      productsCache = [];
+      select.innerHTML = '<option value="" disabled selected>Couldn\'t load products</option>';
+      showToast("Couldn't load products from the server.", true);
+    }
   }
 
   function addItemToCart() {
@@ -368,7 +500,7 @@
       cart.push({
         productId,
         name: product.name,
-        unitPrice: product.unitPrice ?? product.price ?? 0,
+        unitPrice: Number(product.unitPrice) || 0,
         quantity: qty,
       });
     }
@@ -460,11 +592,20 @@
   async function submitSale() {
     if (!cart.length) return;
 
+    if (!window.EvApi) {
+      showToast("Can't record sale — not connected to the server.", true);
+      return;
+    }
+
     const btn = document.getElementById("record-sale-btn");
     btn.disabled = true;
     const originalLabel = document.getElementById("record-sale-label").textContent;
     document.getElementById("record-sale-label").textContent = "Recording...";
 
+    // NOTE: the confirmed /sales GET response has no customerName/customerPhone
+    // columns, so these are likely ignored server-side today. Sending them
+    // is harmless either way — flagging in case the backend rejects unknown
+    // fields once validated more strictly.
     const payload = {
       items: cart.map((c) => ({ productId: c.productId, quantity: c.quantity, unitPrice: c.unitPrice })),
       paymentMethod: selectedPayment,
@@ -473,17 +614,16 @@
     };
 
     try {
-      if (window.EvApi) {
-        await EvApi.json("/sales", { method: "POST", body: JSON.stringify(payload) });
-      }
+      await EvApi.json("/sales", { method: "POST", body: JSON.stringify(payload) });
+      showToast("Sale recorded.");
       resetRecordSaleForm();
       // Switch back to Sales History and refresh
-      document.querySelector('.orders-tab[data-tab="history"]').click();
+      document.querySelector('.orders-tab[data-tab="history"]')?.click();
       loadSales();
     } catch (err) {
       document.getElementById("record-sale-label").textContent = originalLabel;
       btn.disabled = false;
-      alert(err.message || "Couldn't record sale. Please try again.");
+      showToast(err.message || "Couldn't record sale. Please try again.", true);
     }
   }
 
@@ -497,15 +637,24 @@
   }
 
   // ---------- Boot ----------
-  function boot() {
+  async function boot() {
     if (!requireAuth()) return;
 
     decorateIcons();
     setupTabs();
-    loadSales();
-    loadProducts();
     renderPaymentGrid();
     renderCart();
+    loadProducts();
+    loadSales();
+
+    // Coming from dashboard's "+ New Order" (orders.html?tab=record) opens
+    // straight into the Record Sale tab instead of Sales History.
+    const requestedTab = new URLSearchParams(window.location.search).get("tab");
+    if (requestedTab) {
+      document.querySelector('.orders-tab[data-tab="' + requestedTab + '"]')?.click();
+    }
+
+    document.getElementById("export-csv-btn")?.addEventListener("click", exportSalesToCsv);
 
     document.getElementById("order-search")?.addEventListener("input", renderTable);
     document.getElementById("status-filter")?.addEventListener("change", renderTable);
@@ -513,8 +662,10 @@
     document.getElementById("orders-tbody")?.addEventListener("click", (e) => {
       const viewBtn = e.target.closest("[data-view]");
       const receiptBtn = e.target.closest("[data-receipt]");
-      if (viewBtn) showDetailView(viewBtn.getAttribute("data-view"));
-      if (receiptBtn) openReceipt(receiptBtn.getAttribute("data-receipt"));
+      const row = e.target.closest("[data-open]");
+      if (viewBtn) return showDetailView(viewBtn.getAttribute("data-view"));
+      if (receiptBtn) return openReceipt(receiptBtn.getAttribute("data-receipt"));
+      if (row) return showDetailView(row.getAttribute("data-open"));
     });
 
     document.getElementById("back-to-list-btn")?.addEventListener("click", showListView);

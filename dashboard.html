@@ -27,8 +27,7 @@
       data-subtitle="Welcome back! Here's what's happening today."
     >
       <template data-page-actions>
-        <button type="button" class="btn btn-ghost">Export</button>
-        <button type="button" class="btn btn-primary">+ New Order</button>
+        <button type="button" class="btn btn-primary" id="new-order-btn">+ New Order</button>
       </template>
 
       <section class="stats-panel" id="stats-panel" aria-label="Key metrics"></section>
@@ -67,18 +66,18 @@
       </section>
 
       <section class="panel orders-panel" aria-label="Recent orders">
-        <div class="orders-head">
-          <span class="orders-icon" id="orders-icon"></span>
-          <h2 class="orders-title">Recent Orders</h2>
-          <div class="orders-tools">
-            <button type="button" class="pill-btn" id="filter-btn">
-              <span>Filter</span>
-            </button>
-            <button type="button" class="pill-btn" id="sort-btn">
-              <span>Sort By</span>
-            </button>
-          </div>
-        </div>
+      <div class="orders-head">
+  <span class="orders-icon" id="orders-icon"></span>
+  <h2 class="orders-title">Recent Orders</h2>
+  <div class="orders-tools">
+    <!-- <button type="button" class="pill-btn" id="filter-btn">
+      <span>Filter</span>
+    </button> -->
+    <button type="button" class="pill-btn" id="view-all-orders-btn">
+      <span>View All</span>
+    </button>
+  </div>
+</div>
 
         <table class="orders-table">
           <thead>
